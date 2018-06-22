@@ -11,11 +11,13 @@ public class RandomBot implements Runnable {
 	private String winMessage;
 	private int playerNumber;
 	private BoardConfig boardConfig;
-
+	MapFrame mf;
 	public RandomBot(String hostname, String name, String winMessage) {
 		this.hostname = hostname;
 		this.name = name;
 		this.winMessage = winMessage;
+		mf = new MapFrame();
+		mf.setVisible(true);
 	}
 
 	@Override
@@ -33,6 +35,13 @@ public class RandomBot implements Runnable {
 			e.printStackTrace();
 		}
 		while (true) {
+			for(int x = 0; x<256; x++){
+				for(int y = 0; y<256; y++){
+					mf.setPixel(x,y,client.getBoard(x*5, y*5));
+				}	
+			}
+
+			mf.invalidate();
 			if ((update = client.pullNextUpdate()) == null) {
 				try {
 					Thread.sleep(20);
