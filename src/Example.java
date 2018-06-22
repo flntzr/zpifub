@@ -22,7 +22,14 @@ public class Example {
 		// update enthält Bewegung des Spielers, Spawnen von Powerups und Einsammeln von
 		// Powerups
 		while ((update = client.pullNextUpdate()) != null) {
-			// verarbeite Update
+			 //verarbeite update
+		    if (update.type == null) {
+//		        bot[update.player][update.bot].pos = update.x, update.y
+		    } else if (update.player == -1) {
+		        //update spawned, type, position
+		    } else {
+		        //update collected
+		    }
 		}
 	}
 }
