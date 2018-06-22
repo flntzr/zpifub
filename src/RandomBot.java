@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 import lenz.htw.zpifub.Update;
 import lenz.htw.zpifub.net.NetworkClient;
 
@@ -23,29 +27,88 @@ public class RandomBot implements Runnable {
 		client.setMoveDirection(0, 1, 0); // bot 0 go right
 		client.setMoveDirection(1, -1, 0); // bot 1 go left
 		client.setMoveDirection(2, 0, 1); // bot 2 go up
-		while ((update = client.pullNextUpdate()) != null) {
-		    if (update.type == null) {
-		    	System.out.println("Bot at " + update.x + ", " + update.y);
-//		        bot[update.player][update.bot].pos = update.x, update.y
-		    } else if (update.player == -1) {
-		        //update spawned, type, position
-		    	System.out.println("Powerup at " + update.x + ", " + update.y);
-		    } else {
-		        //update collected
-		    	System.out.println("update!");
-		    }
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		while (true) {
+			if ((update = client.pullNextUpdate()) == null) {
+				try {
+					Thread.sleep(20);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				continue;
+			}
+			if (update.type == null) {
+				System.out.println(this.playerNumber + ": " + "Bot " + update.bot + " of player " + update.player
+						+ " at " + update.x + ", " + update.y);
+				this.boardConfig.moveBot(update.player, update.bot, update.x, update.y);
+			} else if (update.player == -1) {
+				// update spawned, type, position
+				System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", " + update.y);
+			} else {
+				// update collected
+				System.out.println("update!");
+			}
+			for (int i = 0; i < this.boardConfig.bots[this.playerNumber].length;i++) {
+				int[] bot = this.boardConfig.bots[this.playerNumber][i];
+				if (bot[0] == 0 && bot[1] == 0) {
+					// Skip this special case where the bot position has not been set yet.
+					continue;
+				}
+				int[] direction = this.pickMove(bot[0], bot[1]);
+				client.setMoveDirection(i, direction[0], direction[1]);
+			}
 		}
 	}
 
 	private BoardConfig getInitialBoard(NetworkClient client) {
+		int[] influenceRadii = new int[3];
+		influenceRadii[0] = client.getInfluenceRadiusForBot(0);
+		influenceRadii[1] = client.getInfluenceRadiusForBot(1);
+		influenceRadii[2] = client.getInfluenceRadiusForBot(2);
 		int[] pixelArray = new int[Util.BOARD_SIZE * Util.BOARD_SIZE];
 		for (int y = 0; y < Util.BOARD_SIZE; y++) {
 			for (int x = 0; x < Util.BOARD_SIZE; x++) {
-				int val = client.getBoard(x, y);
 				pixelArray[y * Util.BOARD_SIZE + x] = client.getBoard(x, y);
 			}
 		}
-		return new BoardConfig(pixelArray);
+		return new BoardConfig(pixelArray, influenceRadii);
 	}
 
+	private int[] pickMove(int x, int y) {
+		List<int[]> possibleMoves = new ArrayList<>();
+		if (boardConfig.isWalkable(x + 1, y)) {
+			int[] move = new int[2];
+			move[0] = x + 1;
+			move[1] = y;
+			possibleMoves.add(move);
+		}
+		if (boardConfig.isWalkable(x - 1, y)) {
+			int[] move = new int[2];
+			move[0] = x - 1;
+			move[1] = y;
+			possibleMoves.add(move);
+		}
+		if (boardConfig.isWalkable(x, y + 1)) {
+			int[] move = new int[2];
+			move[0] = x;
+			move[1] = y + 1;
+			possibleMoves.add(move);
+		}
+		if (boardConfig.isWalkable(x, y - 1)) {
+			int[] move = new int[2];
+			move[0] = x;
+			move[1] = y - 1;
+			possibleMoves.add(move);
+		}
+		
+		int randomNum = possibleMoves.size() == 0 ? 0 : ThreadLocalRandom.current().nextInt(0, possibleMoves.size());
+		int[] pickedMove = possibleMoves.get(randomNum);
+		pickedMove[0] -= x;
+		pickedMove[1] -= y;
+		return pickedMove;
+	}
 }
