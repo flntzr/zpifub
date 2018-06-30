@@ -24,7 +24,7 @@ public class RandomBot implements Runnable {
 	public void run() {
 		NetworkClient client = new NetworkClient(this.hostname, this.name, this.winMessage);
 		this.playerNumber = client.getMyPlayerNumber();
-		this.boardConfig = this.getInitialBoard(client);
+		this.boardConfig = Util.getInitialBoard(client);
 		Update update;
 		client.setMoveDirection(0, 1, 0); // bot 0 go right
 		client.setMoveDirection(1, -1, 0); // bot 1 go left
@@ -51,15 +51,15 @@ public class RandomBot implements Runnable {
 				continue;
 			}
 			if (update.type == null) {
-				System.out.println(this.playerNumber + ": " + "Bot " + update.bot + " of player " + update.player
-						+ " at " + update.x + ", " + update.y);
+//				System.out.println(this.playerNumber + ": " + "Bot " + update.bot + " of player " + update.player
+//						+ " at " + update.x + ", " + update.y);
 				this.boardConfig.moveBot(update.player, update.bot, update.x, update.y);
 			} else if (update.player == -1) {
 				// update spawned, type, position
-				System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", " + update.y);
+//				System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", " + update.y);
 			} else {
 				// update collected
-				System.out.println("update!");
+//				System.out.println("update!");
 			}
 			for (int i = 0; i < this.boardConfig.bots[this.playerNumber].length;i++) {
 				int[] bot = this.boardConfig.bots[this.playerNumber][i];
@@ -71,20 +71,6 @@ public class RandomBot implements Runnable {
 				client.setMoveDirection(i, direction[0], direction[1]);
 			}
 		}
-	}
-
-	private BoardConfig getInitialBoard(NetworkClient client) {
-		int[] influenceRadii = new int[3];
-		influenceRadii[0] = client.getInfluenceRadiusForBot(0);
-		influenceRadii[1] = client.getInfluenceRadiusForBot(1);
-		influenceRadii[2] = client.getInfluenceRadiusForBot(2);
-		int[] pixelArray = new int[Util.BOARD_SIZE * Util.BOARD_SIZE];
-		for (int y = 0; y < Util.BOARD_SIZE; y++) {
-			for (int x = 0; x < Util.BOARD_SIZE; x++) {
-				pixelArray[y * Util.BOARD_SIZE + x] = client.getBoard(x, y);
-			}
-		}
-		return new BoardConfig(pixelArray, influenceRadii);
 	}
 
 	private int[] pickMove(int x, int y) {
@@ -112,6 +98,13 @@ public class RandomBot implements Runnable {
 			move[0] = x;
 			move[1] = y - 1;
 			possibleMoves.add(move);
+		}
+		
+		if (possibleMoves.size() == 0) {
+			int[] move = new int[2];
+			move[0] = 1;
+			move[1] = -1;
+			return move;
 		}
 		
 		int randomNum = possibleMoves.size() == 0 ? 0 : ThreadLocalRandom.current().nextInt(0, possibleMoves.size());
