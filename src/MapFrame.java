@@ -9,6 +9,7 @@ public class MapFrame extends JFrame {
 	
 	BufferedImage image;
 	int[] pixel;
+	int mapSize;
 	JPanel panel = new JPanel() {
 		@Override
         protected void paintComponent(Graphics g) {
@@ -17,21 +18,21 @@ public class MapFrame extends JFrame {
         }
 	};
 	
-	public MapFrame() {
-		image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
-		pixel = new int[256*256];
+	public MapFrame(int mapsize) {
+		this.mapSize = mapsize;
+		image = new BufferedImage(this.mapSize*2, this.mapSize, BufferedImage.TYPE_INT_RGB);
+		pixel = new int[this.mapSize*2*this.mapSize];
 
 		image.getRGB(0, 0, image.getWidth(), image.getHeight(),pixel,0, image.getWidth());
-		for(int i = 0; i<pixel.length; i++){
-			pixel[i] = 255<<8;
-		}
-		image.setRGB(0, 0, image.getWidth(), image.getHeight(),pixel,0, image.getWidth());
+//		for(int i = 0; i<pixel.length; i++){
+//			pixel[i] = 255<<8;
+//		}
 		this.add(panel);
-		this.setSize(new Dimension(256,256));
+		this.setSize(new Dimension(this.mapSize*2+20,this.mapSize+20));
 	}
 	
 	public void setPixel(int x, int y, int color){
-		pixel[y*256 + x] = color;
+		pixel[(y*this.mapSize*2) + x] = color;
 	}
 	
 	public void invalidate() {
