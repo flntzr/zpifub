@@ -11,18 +11,20 @@ public class RandomBot implements Runnable {
 	private String winMessage;
 	private int playerNumber;
 	private BoardConfig boardConfig;
-	MapFrame mf;
+	StrategicMap map;
 	public RandomBot(String hostname, String name, String winMessage) {
 		this.hostname = hostname;
 		this.name = name;
 		this.winMessage = winMessage;
-		mf = new MapFrame();
-		mf.setVisible(true);
+		
 	}
 
 	@Override
 	public void run() {
 		NetworkClient client = new NetworkClient(this.hostname, this.name, this.winMessage);
+		if(name=="random1") {
+			map = new StrategicMap(client);
+		}
 		this.playerNumber = client.getMyPlayerNumber();
 		this.boardConfig = Util.getInitialBoard(client);
 		Update update;
@@ -35,13 +37,11 @@ public class RandomBot implements Runnable {
 			e.printStackTrace();
 		}
 		while (true) {
-			for(int x = 0; x<256; x++){
-				for(int y = 0; y<256; y++){
-					mf.setPixel(x,y,client.getBoard(x*5, y*5));
-				}	
+			
+			if(name=="random1"){
+				map.render();
 			}
 
-			mf.invalidate();
 			if ((update = client.pullNextUpdate()) == null) {
 				try {
 					Thread.sleep(20);
