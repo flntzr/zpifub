@@ -13,8 +13,9 @@ public class BoardConfig {
 	public final int[] influenceRadii;
 
 	public BoardConfig(int[] influenceRadii) {
-//		this.pixelArray = new int[Util.BOARD_SIZE * Util.BOARD_SIZE];
-//		System.arraycopy(pixelArray, 0, this.pixelArray, 0, Util.BOARD_SIZE * Util.BOARD_SIZE);
+		// this.pixelArray = new int[Util.BOARD_SIZE * Util.BOARD_SIZE];
+		// System.arraycopy(pixelArray, 0, this.pixelArray, 0, Util.BOARD_SIZE *
+		// Util.BOARD_SIZE);
 		this.bots = new int[3][3][2]; // 3 players, 3 bots, 2 coordinates
 		this.influenceRadii = influenceRadii;
 	}
@@ -47,12 +48,7 @@ public class BoardConfig {
 		Map<Integer, Integer> cameFrom = new HashMap<>(); // most efficient previous step
 		Map<Integer, Double> gScore = new HashMap<>(); // each node with cost it takes to reach from previous node
 		Map<Integer, Double> fScore = new HashMap<>(); // each node with cost it takes to reach from the start
-		TreeSet<Integer> openSet = new TreeSet<Integer>(new Comparator<Integer>() {
-			@Override
-			public int compare(Integer o1, Integer o2) {
-				return -fScore.getOrDefault(o1, Double.MAX_VALUE).compareTo(fScore.getOrDefault(o2, Double.MAX_VALUE));
-			}
-		});
+		List<Integer> openSet = new ArrayList<>();
 		openSet.add(start);
 		for (int i = 0; i < (boardSize * boardSize); i++) {
 			gScore.put(i, Double.MAX_VALUE);
@@ -61,11 +57,11 @@ public class BoardConfig {
 		gScore.put(start, 0d); // cost to start = 0
 		fScore.put(start, this.estimateCost(start, goal, layer));
 		while (!openSet.isEmpty()) {
-			int current = openSet.first(); // treeSet is sorted ascending by fScore -> always get lowest
+			int current = openSet.get(0); // openSet is sorted ascending by fScore -> always get lowest
 			if (current == goal) {
 				return reconstructPath(cameFrom, current);
 			}
-			openSet.remove(current);
+			openSet.remove(0);
 			closedSet.add(current);
 
 			for (int neighbor : this.getWalkableNeighbors(layer, current, boardSize)) {
@@ -84,6 +80,12 @@ public class BoardConfig {
 				cameFrom.put(neighbor, current);
 				gScore.put(neighbor, tentativeGScore);
 				fScore.put(neighbor, gScore.get(neighbor) + this.estimateCost(neighbor, goal, layer));
+				openSet.sort(new Comparator<Integer>() {
+					@Override
+					public int compare(Integer o1, Integer o2) {
+						return fScore.getOrDefault(o1, Double.MAX_VALUE).compareTo(fScore.getOrDefault(o2, Double.MAX_VALUE));
+					}
+				});
 			}
 		}
 		return new ArrayList<>(); // goal is not reachable
@@ -91,12 +93,8 @@ public class BoardConfig {
 
 	private double estimateCost(int start, int goal, int layer) {
 		int boardSize = Util.BOARD_SIZE >> layer;
-		int startX = start % boardSize;
-		int startY = start / boardSize;
-		int goalX = goal % boardSize;
-		int goalY = goal / boardSize;
-		int distanceX = startX - goalX;
-		int distanceY = startY - goalY;
+		int distanceX = (start % boardSize) - (goal % boardSize);
+		int distanceY = (start / boardSize) - (goal / boardSize);
 		return Math.sqrt(distanceX * distanceX + distanceY * distanceY); // euclidian distance
 	}
 

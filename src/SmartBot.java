@@ -86,6 +86,7 @@ public class SmartBot implements Runnable {
 				// + update.y);
 				if (!debugRunning) {
 					debugRunning = true;
+					System.out.println("Start A*");
 					List<Integer> path = this.boardConfig.aStar(20*64+10,
 							 40*64+40, 4);
 					System.out.println(path);

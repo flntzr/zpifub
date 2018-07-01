@@ -8,13 +8,6 @@ public class Util {
 		influenceRadii[0] = client.getInfluenceRadiusForBot(0);
 		influenceRadii[1] = client.getInfluenceRadiusForBot(1);
 		influenceRadii[2] = client.getInfluenceRadiusForBot(2);
-//		int[] pixelArray = new int[Util.BOARD_SIZE * Util.BOARD_SIZE];
-//		for (int y = 0; y < Util.BOARD_SIZE; y++) {
-//			for (int x = 0; x < Util.BOARD_SIZE; x++) {
-//				int color =client.getBoard(x, y);
-//				pixelArray[y * Util.BOARD_SIZE + x] = color;
-//			}
-//		}
 		return new BoardConfig(influenceRadii);
 	}
 
