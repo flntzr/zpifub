@@ -49,13 +49,6 @@ public class BoardConfig {
 		Map<Integer, Double> gScore = new HashMap<>(); // each node with cost it takes to reach from previous node
 		Map<Integer, Double> fScore = new HashMap<>(); // each node with cost it takes to reach from the start
 		List<Integer> openSet = new ArrayList<>();
-		// TreeSet<Integer> openSet = new TreeSet<Integer>(new Comparator<Integer>() {
-		// @Override
-		// public int compare(Integer o1, Integer o2) {
-		// return -fScore.getOrDefault(o1,
-		// Double.MAX_VALUE).compareTo(fScore.getOrDefault(o2, Double.MAX_VALUE));
-		// }
-		// });
 		openSet.add(start);
 		for (int i = 0; i < (boardSize * boardSize); i++) {
 			gScore.put(i, Double.MAX_VALUE);
@@ -100,12 +93,8 @@ public class BoardConfig {
 
 	private double estimateCost(int start, int goal, int layer) {
 		int boardSize = Util.BOARD_SIZE >> layer;
-		int startX = start % boardSize;
-		int startY = start / boardSize;
-		int goalX = goal % boardSize;
-		int goalY = goal / boardSize;
-		int distanceX = startX - goalX;
-		int distanceY = startY - goalY;
+		int distanceX = (start % boardSize) - (goal % boardSize);
+		int distanceY = (start / boardSize) - (goal / boardSize);
 		return Math.sqrt(distanceX * distanceX + distanceY * distanceY); // euclidian distance
 	}
 
