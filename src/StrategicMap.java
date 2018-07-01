@@ -6,19 +6,28 @@ public class StrategicMap {
 
 	MapFrame mapframe;
 	NetworkClient client;
-	public StrategicMap(NetworkClient client) {
+	private BoardConfig config;
+
+	public StrategicMap(NetworkClient client, BoardConfig config, boolean display) {
 		this.client = client;
 		mapframe = new MapFrame(Util.BOARD_SIZE);		
-		mapframe.setVisible(true);
-		layer = new int[10][][];
+		mapframe.setVisible(display);
+		this.config = config;
+		config.layer = new int[10][][];
+		config.layer = new int[10][][];
 		int size  = Util.BOARD_SIZE;
-		for(int i = 0; i < layer.length; i++){
-			layer[i] = new int[size][size];
+		for(int i = 0; i < config.layer.length; i++){
+			config.layer[i] = new int[size][size];
 			size = size / 2;
 		}
 	}
 	
-	int[][][] layer;
+
+	//int[][][] layer;
+	
+	public void add(int x,int y ,int minSize){
+		refreshLayer(0,minSize,(x/minSize)*minSize,(y/minSize)*minSize);
+	}
 	
 	public void update(int x,int y ,int minSize){
 
@@ -56,6 +65,7 @@ public class StrategicMap {
 		//update2(rand.nextInt(1023),rand.nextInt(1023),0,0,1024,9,16);
 
 
+		//refreshLayer(0,minSize,(x/minSize)*minSize,(y/minSize)*minSize);
 
 		update2(x,y,0,0,1024,9,minSize);
 		//update2(300,300,0,0,1024,9,16);
@@ -67,7 +77,7 @@ public class StrategicMap {
 	int yY = 0;
 	Random rand = new Random();
 	
-	public void update2(int xIn, int yIn,int xOffset,int yOffset, int size, int layer, int minsize){
+	private void update2(int xIn, int yIn,int xOffset,int yOffset, int size, int layer, int minsize){
 		
 		if(xIn < (size/2)+xOffset && yIn < (size/2)+yOffset ) {
 			//TopLeft
@@ -77,12 +87,8 @@ public class StrategicMap {
 				refreshLayer(layer,1024>>layer,0,0);
 			}
 			else {
-				refreshLayer(0,size,xOffset,yOffset);
-//				refreshLayer(0,size,0,0);
-				//				refreshLayer(1,size,xOffset,yOffset);
-//				refreshLayer(2,size>>1,xOffset>>1,yOffset>>1);
-//				refreshLayer(1,size>>1,xOffset+16,yOffset);
-				//refreshLayer(1,size,xOffset+16,yOffset);
+				//refreshLayer(0,size,xOffset,yOffset);
+
 				for(int l = 1; l<layer+1; l++ ) {
 					refreshLayer(l,size>>(l-1),xOffset>>(l-1),yOffset>>(l-1));
 				}
@@ -99,7 +105,7 @@ public class StrategicMap {
 //
 			}
 			else {
-				refreshLayer(0,size,xOffset,yOffset);
+				//refreshLayer(0,size,xOffset,yOffset);
 //				refreshLayer(0,size,size,0);
 				for(int l = 1; l<layer+1; l++ ) {
 					refreshLayer(l,size>>(l-1),xOffset>>(l-1),yOffset>>(l-1));
@@ -114,7 +120,7 @@ public class StrategicMap {
 				update2(xIn,yIn,xOffset,yOffset+size/2,size/2,layer-1,minsize);
 				refreshLayer(layer,1024>>layer-1,0,0);
 			} else {
-				refreshLayer(0,size,xOffset,yOffset);
+				//refreshLayer(0,size,xOffset,yOffset);
 				for(int l = 1; l<layer+1; l++ ) {
 					refreshLayer(l,size>>(l-1),xOffset>>(l-1),yOffset>>(l-1));
 				}
@@ -125,7 +131,7 @@ public class StrategicMap {
 				update2(xIn,yIn,xOffset+size/2,yOffset+size/2,size/2,layer-1,minsize);
 				refreshLayer(layer,1024>>layer-1,0,0);
 			} else {
-				refreshLayer(0,size,xOffset,yOffset);
+				//refreshLayer(0,size,xOffset,yOffset);
 				for(int l = 1; l<layer+1; l++ ) {
 					refreshLayer(l,size>>(l-1),xOffset>>(l-1),yOffset>>(l-1));
 				}
@@ -149,7 +155,7 @@ public class StrategicMap {
 		if(layerN == 0){
 			for(int x = 0; x<size; x++){
 				for(int y = 0; y<size; y++){
-					layer[0][x+xOffset][y+yOffset] = client.getBoard(x+xOffset, y+yOffset);					
+					config.layer[0][x+xOffset][y+yOffset] = client.getBoard(x+xOffset, y+yOffset);					
 				}	
 			}
 		} else {
@@ -158,37 +164,40 @@ public class StrategicMap {
 				for(int y = 0; y < size ; y+=2){
 					int xIn = x+xOffset;
 					int yIn = y+yOffset;
-					int r =(((layer[l][xIn    ][yIn    ] >> 16) & 0x000000ff) + 
-							((layer[l][xIn + 1][yIn    ] >> 16) & 0x000000ff) + 
-							((layer[l][xIn    ][yIn + 1] >> 16) & 0x000000ff) + 
-							((layer[l][xIn + 1][yIn + 1] >> 16) & 0x000000ff)) >> 2;
+					int r =(((config.layer[l][xIn    ][yIn    ] >> 16) & 0x000000ff) + 
+							((config.layer[l][xIn + 1][yIn    ] >> 16) & 0x000000ff) + 
+							((config.layer[l][xIn    ][yIn + 1] >> 16) & 0x000000ff) + 
+							((config.layer[l][xIn + 1][yIn + 1] >> 16) & 0x000000ff)) >> 2;
 					
-					int g =(((layer[l][xIn    ][yIn    ] >> 8 ) & 0x000000ff) + 
-							((layer[l][xIn + 1][yIn    ] >> 8 ) & 0x000000ff) + 
-							((layer[l][xIn    ][yIn + 1] >> 8 ) & 0x000000ff) + 
-							((layer[l][xIn + 1][yIn + 1] >> 8 ) & 0x000000ff)) >> 2;
+					int g =(((config.layer[l][xIn    ][yIn    ] >> 8 ) & 0x000000ff) + 
+							((config.layer[l][xIn + 1][yIn    ] >> 8 ) & 0x000000ff) + 
+							((config.layer[l][xIn    ][yIn + 1] >> 8 ) & 0x000000ff) + 
+							((config.layer[l][xIn + 1][yIn + 1] >> 8 ) & 0x000000ff)) >> 2;
 							
-					int b =(((layer[l][xIn    ][yIn    ] >> 0 ) & 0x000000ff) + 
-							((layer[l][xIn + 1][yIn    ] >> 0 ) & 0x000000ff) + 
-							((layer[l][xIn    ][yIn + 1] >> 0 ) & 0x000000ff) + 
-							((layer[l][xIn + 1][yIn + 1] >> 0 ) & 0x000000ff)) >> 2;		
+					int b =(((config.layer[l][xIn    ][yIn    ] >> 0 ) & 0x000000ff) + 
+							((config.layer[l][xIn + 1][yIn    ] >> 0 ) & 0x000000ff) + 
+							((config.layer[l][xIn    ][yIn + 1] >> 0 ) & 0x000000ff) + 
+							((config.layer[l][xIn + 1][yIn + 1] >> 0 ) & 0x000000ff)) >> 2;		
 					
-					layer[layerN][(x+xOffset)>>1][(y+yOffset)>>1] = (r <<16 | g << 8 | b);			
+							config.layer[layerN][(x+xOffset)>>1][(y+yOffset)>>1] = (r <<16 | g << 8 | b);
 				}	
 			}
 		}
 	}
 	
 	public void render() {
+		
+		//update(xXx,yYy,warumGehtDieScheißeNichtHäääää);
+		
 		int offsetX = 0;
 		int offsetY = 0;
 		int size = 1;
 		int offsetIncrease = 1024;		
 		for(int l = 0; l < 10; l++) {
 			if(l<5) {
-				for(int y = 0; y < layer[l].length; y+=size){
-					for(int x = 0; x < layer[l].length; x += size){			
-						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, layer[l][x][y]);
+				for(int y = 0; y < config.layer[l].length; y+=size){
+					for(int x = 0; x < config.layer[l].length; x += size){			
+						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, config.layer[l][x][y]);
 					}
 				}
 				//size = size << 1;
@@ -199,9 +208,9 @@ public class StrategicMap {
 				offsetX = 1600;
 				if(l==5 )offsetY = 0;
 				else offsetY = (l-4)*140+50;
-				for(int y = 0; y < layer[l].length*8; y++){
-					for(int x = 0; x < layer[l].length*8; x ++){			
-						mapframe.setPixel((x) + offsetX, (y) + offsetY, layer[l][x/8][y/8]);
+				for(int y = 0; y < config.layer[l].length*8; y++){
+					for(int x = 0; x < config.layer[l].length*8; x ++){			
+						mapframe.setPixel((x) + offsetX, (y) + offsetY, config.layer[l][x/8][y/8]);
 					}
 				}
 			}

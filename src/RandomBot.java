@@ -12,21 +12,21 @@ public class RandomBot implements Runnable {
 	private int playerNumber;
 	private BoardConfig boardConfig;
 	StrategicMap map;
+
 	public RandomBot(String hostname, String name, String winMessage) {
 		this.hostname = hostname;
 		this.name = name;
 		this.winMessage = winMessage;
-		
+
 	}
 
 	@Override
 	public void run() {
 		NetworkClient client = new NetworkClient(this.hostname, this.name, this.winMessage);
-		if(name=="random1") {
-			map = new StrategicMap(client);
-		}
 		this.playerNumber = client.getMyPlayerNumber();
-		this.boardConfig = this.getInitialBoard(client);
+		this.boardConfig = Util.getInitialBoard(client);
+		
+		map = new StrategicMap(client, this.boardConfig, false);
 		Update update;
 		client.setMoveDirection(0, 1, 0); // bot 0 go right
 		client.setMoveDirection(1, -1, 0); // bot 1 go left
@@ -37,10 +37,11 @@ public class RandomBot implements Runnable {
 			e.printStackTrace();
 		}
 		while (true) {
-			
-			if(name=="random1"){
-				map.render();
-			}
+
+			 if(name=="random1"){
+				//map.update(0,0,512);
+				//map.render(0,0,512);
+			 }
 
 			if ((update = client.pullNextUpdate()) == null) {
 				try {
@@ -51,17 +52,19 @@ public class RandomBot implements Runnable {
 				continue;
 			}
 			if (update.type == null) {
-				System.out.println(this.playerNumber + ": " + "Bot " + update.bot + " of player " + update.player
-						+ " at " + update.x + ", " + update.y);
+				// System.out.println(this.playerNumber + ": " + "Bot " + update.bot + " of
+				// player " + update.player
+				// + " at " + update.x + ", " + update.y);
 				this.boardConfig.moveBot(update.player, update.bot, update.x, update.y);
 			} else if (update.player == -1) {
 				// update spawned, type, position
-				System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", " + update.y);
+				// System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", "
+				// + update.y);
 			} else {
 				// update collected
-				System.out.println("update!");
+				// System.out.println("update!");
 			}
-			for (int i = 0; i < this.boardConfig.bots[this.playerNumber].length;i++) {
+			for (int i = 0; i < this.boardConfig.bots[this.playerNumber].length; i++) {
 				int[] bot = this.boardConfig.bots[this.playerNumber][i];
 				if (bot[0] == 0 && bot[1] == 0) {
 					// Skip this special case where the bot position has not been set yet.
@@ -73,47 +76,40 @@ public class RandomBot implements Runnable {
 		}
 	}
 
-	private BoardConfig getInitialBoard(NetworkClient client) {
-		int[] influenceRadii = new int[3];
-		influenceRadii[0] = client.getInfluenceRadiusForBot(0);
-		influenceRadii[1] = client.getInfluenceRadiusForBot(1);
-		influenceRadii[2] = client.getInfluenceRadiusForBot(2);
-		int[] pixelArray = new int[Util.BOARD_SIZE * Util.BOARD_SIZE];
-		for (int y = 0; y < Util.BOARD_SIZE; y++) {
-			for (int x = 0; x < Util.BOARD_SIZE; x++) {
-				pixelArray[y * Util.BOARD_SIZE + x] = client.getBoard(x, y);
-			}
-		}
-		return new BoardConfig(pixelArray, influenceRadii);
-	}
-
 	private int[] pickMove(int x, int y) {
 		List<int[]> possibleMoves = new ArrayList<>();
-		if (boardConfig.isWalkable(x + 1, y)) {
+		if (boardConfig.isWalkable(0, x + 1, y)) {
 			int[] move = new int[2];
 			move[0] = x + 1;
 			move[1] = y;
 			possibleMoves.add(move);
 		}
-		if (boardConfig.isWalkable(x - 1, y)) {
+		if (boardConfig.isWalkable(0, x - 1, y)) {
 			int[] move = new int[2];
 			move[0] = x - 1;
 			move[1] = y;
 			possibleMoves.add(move);
 		}
-		if (boardConfig.isWalkable(x, y + 1)) {
+		if (boardConfig.isWalkable(0, x, y + 1)) {
 			int[] move = new int[2];
 			move[0] = x;
 			move[1] = y + 1;
 			possibleMoves.add(move);
 		}
-		if (boardConfig.isWalkable(x, y - 1)) {
+		if (boardConfig.isWalkable(0, x, y - 1)) {
 			int[] move = new int[2];
 			move[0] = x;
 			move[1] = y - 1;
 			possibleMoves.add(move);
 		}
-		
+
+		if (possibleMoves.size() == 0) {
+			int[] move = new int[2];
+			move[0] = 1;
+			move[1] = -1;
+			return move;
+		}
+
 		int randomNum = possibleMoves.size() == 0 ? 0 : ThreadLocalRandom.current().nextInt(0, possibleMoves.size());
 		int[] pickedMove = possibleMoves.get(randomNum);
 		pickedMove[0] -= x;
