@@ -1,23 +1,20 @@
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import lenz.htw.zpifub.Update;
 import lenz.htw.zpifub.net.NetworkClient;
 
-public class RandomBot implements Runnable {
+public class SmartBot implements Runnable {
 	private String hostname;
 	private String name;
 	private String winMessage;
 	private int playerNumber;
 	private BoardConfig boardConfig;
-	StrategicMap map;
+	private StrategicMap map;
 
-	public RandomBot(String hostname, String name, String winMessage) {
+	public SmartBot(String hostname, String name, String winMessage) {
 		this.hostname = hostname;
 		this.name = name;
 		this.winMessage = winMessage;
-
 	}
 
 	@Override
@@ -25,22 +22,19 @@ public class RandomBot implements Runnable {
 		NetworkClient client = new NetworkClient(this.hostname, this.name, this.winMessage);
 		this.playerNumber = client.getMyPlayerNumber();
 		this.boardConfig = Util.getInitialBoard(client);
-		map = new StrategicMap(client, this.boardConfig, false);
+		this.map = new StrategicMap(client, this.boardConfig, name == "smart1");
 		Update update;
-		client.setMoveDirection(0, 1, 0); // bot 0 go right
-		client.setMoveDirection(1, -1, 0); // bot 1 go left
-		client.setMoveDirection(2, 0, 1); // bot 2 go up
+		client.setMoveDirection(0, 1, 1); // bot 0 go up-right
+		client.setMoveDirection(1, 1, -1); // bot 1 go down-right
+		client.setMoveDirection(2, -1, 0); // bot 2 go left
+		boolean debugRunning = false;
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		while (true) {
-
-			// if(name=="random1"){
-			 map.render();
-			// }
-
+			map.render();
 			if ((update = client.pullNextUpdate()) == null) {
 				try {
 					Thread.sleep(20);
@@ -58,6 +52,12 @@ public class RandomBot implements Runnable {
 				// update spawned, type, position
 				// System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", "
 				// + update.y);
+				if (!debugRunning) {
+					debugRunning = true;
+					List<Integer> path = this.boardConfig.aStar(20*64+10,
+							 40*64+40, 4);
+					System.out.println(path);
+				}
 			} else {
 				// update collected
 				// System.out.println("update!");
@@ -68,50 +68,8 @@ public class RandomBot implements Runnable {
 					// Skip this special case where the bot position has not been set yet.
 					continue;
 				}
-				int[] direction = this.pickMove(bot[0], bot[1]);
-				client.setMoveDirection(i, direction[0], direction[1]);
 			}
 		}
 	}
 
-	private int[] pickMove(int x, int y) {
-		List<int[]> possibleMoves = new ArrayList<>();
-		if (boardConfig.isWalkable(0, x + 1, y)) {
-			int[] move = new int[2];
-			move[0] = x + 1;
-			move[1] = y;
-			possibleMoves.add(move);
-		}
-		if (boardConfig.isWalkable(0, x - 1, y)) {
-			int[] move = new int[2];
-			move[0] = x - 1;
-			move[1] = y;
-			possibleMoves.add(move);
-		}
-		if (boardConfig.isWalkable(0, x, y + 1)) {
-			int[] move = new int[2];
-			move[0] = x;
-			move[1] = y + 1;
-			possibleMoves.add(move);
-		}
-		if (boardConfig.isWalkable(0, x, y - 1)) {
-			int[] move = new int[2];
-			move[0] = x;
-			move[1] = y - 1;
-			possibleMoves.add(move);
-		}
-
-		if (possibleMoves.size() == 0) {
-			int[] move = new int[2];
-			move[0] = 1;
-			move[1] = -1;
-			return move;
-		}
-
-		int randomNum = possibleMoves.size() == 0 ? 0 : ThreadLocalRandom.current().nextInt(0, possibleMoves.size());
-		int[] pickedMove = possibleMoves.get(randomNum);
-		pickedMove[0] -= x;
-		pickedMove[1] -= y;
-		return pickedMove;
-	}
 }

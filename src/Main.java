@@ -9,11 +9,16 @@ public class Main {
 		}
 		Main.startRandomBotThread("random1");
 		Main.startRandomBotThread("random2");
-		Main.startRandomBotThread("random3");
+		Main.startSmartBotThread("smart1");
 	}
 	
 	private static void startRandomBotThread(String name) {
 		RandomBot bot = new RandomBot(null, name, "Oof!");
+		(new Thread(bot)).start();
+	}
+	
+	private static void startSmartBotThread(String name) {
+		SmartBot bot = new SmartBot(null, name, "Oof!");
 		(new Thread(bot)).start();
 	}
 	
