@@ -11,6 +11,16 @@ public class RandomBot implements Runnable {
 	private String winMessage;
 	private int playerNumber;
 	private BoardConfig boardConfig;
+	private final int[][] randomMoves = {
+			{1, 0},
+			{-1, 0},
+			{0, 1},
+			{0, -1},
+			{1, 1},
+			{1, -1},
+			{-1, 1},
+			{-1, -1}
+	};
 	StrategicMap map;
 
 	public RandomBot(String hostname, String name, String winMessage) {
@@ -26,7 +36,7 @@ public class RandomBot implements Runnable {
 		this.playerNumber = client.getMyPlayerNumber();
 		this.boardConfig = Util.getInitialBoard(client);
 		
-		map = new StrategicMap(client, this.boardConfig, false);
+//		map = new StrategicMap(client, this.boardConfig, false);
 		Update update;
 		client.setMoveDirection(0, 1, 0); // bot 0 go right
 		client.setMoveDirection(1, -1, 0); // bot 1 go left
@@ -37,8 +47,8 @@ public class RandomBot implements Runnable {
 			e.printStackTrace();
 		}
 		while (true) {
-			map.add(0, 0, Util.BOARD_SIZE);
-			map.update(0, 0, Util.BOARD_SIZE);
+//			map.add(0, 0, Util.BOARD_SIZE);
+//			map.update(0, 0, Util.BOARD_SIZE);
 
 			 if(name=="random1"){
 				//map.update(0,0,512);
@@ -67,17 +77,23 @@ public class RandomBot implements Runnable {
 				// System.out.println("update!");
 			}
 			for (int i = 0; i < this.boardConfig.bots[this.playerNumber].length; i++) {
-				int[] bot = this.boardConfig.bots[this.playerNumber][i];
-				if (bot[0] == 0 && bot[1] == 0) {
-					// Skip this special case where the bot position has not been set yet.
-					continue;
-				}
-				int[] direction = this.pickMove(bot[0], bot[1]);
+				int[] direction = this.pickStupidMove();
+//				int[] bot = this.boardConfig.bots[this.playerNumber][i];
+//				if (bot[0] == 0 && bot[1] == 0) {
+//					// Skip this special case where the bot position has not been set yet.
+//					continue;
+//				}
+//				int[] direction = this.pickMove(bot[0], bot[1]);
 				client.setMoveDirection(i, direction[0], direction[1]);
 			}
 		}
 	}
 
+	private int[] pickStupidMove() {
+		int randomNum = ThreadLocalRandom.current().nextInt(0, this.randomMoves.length);
+		return this.randomMoves[randomNum];
+	}
+	
 	private int[] pickMove(int x, int y) {
 		List<int[]> possibleMoves = new ArrayList<>();
 		if (boardConfig.isWalkable(0, x + 1, y)) {
