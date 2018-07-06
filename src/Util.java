@@ -19,7 +19,7 @@ public class Util {
 	 */
 	public static int getColorScore(int playerID, int color) {
 		if (color == 0) {
-			return 0;
+			return -10;
 		}
 		int ownColorDistanceTo255 = 255 - ((color >> ((2 - playerID) * 8)) & 0xFF); // range: [0, 255]
 		int otherColorsDistanceTo0 = ((color >> (((1 - playerID) % 3) * 8)) & 0xFF) + ((color >> (((-playerID) % 3) * 8)) & 0xFF); // range : [0, 510]
