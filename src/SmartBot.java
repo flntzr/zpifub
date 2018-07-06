@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 import lenz.htw.zpifub.Update;
@@ -34,6 +35,17 @@ public class SmartBot implements Runnable {
 			e.printStackTrace();
 		}
 		int counter= 0;
+		
+		map.add(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],1024);
+		map.update(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],1024);
+		Thread heatmapUpdateThread = new Thread(new ScoreHeatmapUpdateThread(this.playerNumber, this.boardConfig));
+		List<Thread> botThreads = new ArrayList<>();
+		botThreads.add(new Thread(new BrushThread(this.boardConfig)));
+		heatmapUpdateThread.start();
+		for (Thread t: botThreads) {
+			System.out.println(this.boardConfig);
+			t.start();
+		}
 
 		while (true) {
 			map.add(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],1024);

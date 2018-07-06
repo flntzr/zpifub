@@ -37,6 +37,8 @@ public class RandomBot implements Runnable {
 			e.printStackTrace();
 		}
 		while (true) {
+			map.add(0, 0, Util.BOARD_SIZE);
+			map.update(0, 0, Util.BOARD_SIZE);
 
 			 if(name=="random1"){
 				//map.update(0,0,512);
