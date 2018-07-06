@@ -33,40 +33,18 @@ public class SmartBot implements Runnable {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		int counter= 0;
 
+		map.initWalkMap();
+		map.add(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],1024);
+		map.update(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],1024);
 		while (true) {
 			map.add(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],1024);
 			map.update(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],1024);
-//			if(true){
-//
-//				map.add(this.boardConfig.bots[0][0][0],this.boardConfig.bots[0][0][1],128);
-//				map.add(this.boardConfig.bots[0][1][0],this.boardConfig.bots[0][1][1],128);
-//				map.add(this.boardConfig.bots[0][2][0],this.boardConfig.bots[0][2][1],128);
-//				
-//				map.add(this.boardConfig.bots[1][0][0],this.boardConfig.bots[1][0][1],128);
-//				map.add(this.boardConfig.bots[1][1][0],this.boardConfig.bots[1][1][1],128);
-//				map.add(this.boardConfig.bots[1][2][0],this.boardConfig.bots[1][2][1],128);
-//				
-//				map.add(this.boardConfig.bots[2][0][0],this.boardConfig.bots[2][0][1],128);
-//				map.add(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],128);
-//				map.add(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],128);
-//				
-//				map.update(this.boardConfig.bots[0][0][0],this.boardConfig.bots[0][0][1],128);
-//				map.update(this.boardConfig.bots[0][1][0],this.boardConfig.bots[0][1][1],128);
-//				map.update(this.boardConfig.bots[0][2][0],this.boardConfig.bots[0][2][1],128);
-//				
-//				map.update(this.boardConfig.bots[1][0][0],this.boardConfig.bots[1][0][1],128);
-//				map.update(this.boardConfig.bots[1][1][0],this.boardConfig.bots[1][1][1],128);
-//				map.update(this.boardConfig.bots[1][2][0],this.boardConfig.bots[1][2][1],128);
-//				
-//				map.update(this.boardConfig.bots[2][0][0],this.boardConfig.bots[2][0][1],128);
-//				map.update(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],128);
-//				map.update(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],128);
-//			}
 
 
-			map.render();
+
+//			map.render();
+			map.renderWalkMap();
 			if ((update = client.pullNextUpdate()) == null) {
 				try {
 					Thread.sleep(20);

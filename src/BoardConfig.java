@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class BoardConfig {
+	public int[][][] walklayer;
+	public int[][][] debuglayer;
 	public int[][][] layer;
 	public int[][][] bots; // [player number][bot number][pixelArray index]
 	public final int[] influenceRadii;
