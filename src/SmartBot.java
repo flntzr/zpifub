@@ -28,7 +28,6 @@ public class SmartBot implements Runnable {
 		client.setMoveDirection(0, 1, 1); // bot 0 go up-right
 		client.setMoveDirection(1, 1, -1); // bot 1 go down-right
 		client.setMoveDirection(2, -1, 0); // bot 2 go left
-		boolean debugRunning = false;
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
@@ -40,8 +39,8 @@ public class SmartBot implements Runnable {
 		map.update(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],1024);
 		Thread heatmapUpdateThread = new Thread(new ScoreHeatmapUpdateThread(this.playerNumber, this.boardConfig));
 		List<Thread> botThreads = new ArrayList<>();
-		botThreads.add(new Thread(new BrushThread(this.boardConfig)));
 		heatmapUpdateThread.start();
+		botThreads.add(new Thread(new BrushThread(this.boardConfig, this.playerNumber)));
 		for (Thread t: botThreads) {
 			System.out.println(this.boardConfig);
 			t.start();
@@ -96,13 +95,6 @@ public class SmartBot implements Runnable {
 				// update spawned, type, position
 				// System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", "
 				// + update.y);
-				if (!debugRunning) {
-					debugRunning = true;
-					System.out.println("Start A*");
-					List<Integer> path = this.boardConfig.aStar(20*64+10,
-							 40*64+40, 4);
-					System.out.println(path);
-				}
 			} else {
 				// update collected
 				// System.out.println("update!");
