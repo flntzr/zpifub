@@ -11,6 +11,21 @@ public class Util {
 		return new BoardConfig(influenceRadii);
 	}
 
+	/**
+	 * Scores color from the viewpoint of the given player.
+	 * @param playerID
+	 * @param color
+	 * @return Score in range [0, 255]
+	 */
+	public static int getColorScore(int playerID, int color) {
+		if (color == 0) {
+			return 0;
+		}
+		int ownColorDistanceTo255 = 255 - ((color >> ((2 - playerID) * 8)) & 0xFF); // range: [0, 255]
+		int otherColorsDistanceTo0 = ((color >> (((1 - playerID) % 3) * 8)) & 0xFF) + ((color >> (((-playerID) % 3) * 8)) & 0xFF); // range : [0, 510]
+		return (ownColorDistanceTo255 + otherColorsDistanceTo0) / 3;
+	}
+
 	public static int[] getNeighbors(int index, int boardSize) {
 		int x = index % boardSize;
 		int y = index / boardSize;
