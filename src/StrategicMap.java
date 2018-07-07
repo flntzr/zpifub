@@ -36,7 +36,6 @@ public class StrategicMap {
 		update2(x,y,0,0,1024,9,minSize);
 		xX+=32;
 		if(xX%1024==0) yY+=32;
-		System.out.println(xX+":"+yY);
 	}
 	int xX = 0;
 	int yY = 0;
@@ -106,25 +105,34 @@ public class StrategicMap {
 	
 	//Erster versuch basierend auf Distanz	
 	public int[] getValuableDestination(int startX, int startY,int playernumber){
-		
+		int layer = 7;
 		int dist = Integer.MIN_VALUE;
 		int delta = 0;
 		int bestX = 0;
 		int bestY = 0;
 		int gegenerA = (playernumber+1)%3;
 		int gegenerB = (playernumber+1)%3;
-		for(int x = 0; x < config.walklayer[8].length; x++){
-			for(int y = 0; y < config.walklayer[8].length; y++){
+
+		for(int x = 0; x < config.walklayer[layer].length; x++){
+			for(int y = 0; y < config.walklayer[layer].length; y++){
+				if(this.config.walklayer[layer][x][y]==0)continue;
 				//Distanz über alle gegner figuren
-				delta = config.bots[gegenerA][0][0]*config.bots[gegenerA][0][0] + config.bots[gegenerA][0][1]*config.bots[gegenerA][0][1];
+				int xX = config.bots[gegenerA][0][0]-x<<layer;
+				int yY = config.bots[gegenerA][0][1]-y<<layer;
+				delta = xX*xX+yY*yY;
+				if(delta<0) delta = -delta;
+
+				//delta = config.bots[gegenerA][0][0]*config.bots[gegenerA][0][0] + config.bots[gegenerA][0][1]*config.bots[gegenerA][0][1];
 				if(dist<delta){
 					dist = delta;
 					bestX = x;
-					bestY = y;
+					bestY = y;					
 				}
-			}	
+//				config.debuglayer[layer][x][y] = (int)(((delta/1.41421f)+0.5f)*255.0f);
+				//if(delta<0.5f) config.debuglayer[layer][x][y] = config.debuglayer[layer][x][y]<<8;
+			}
 		}
-		
+
 		return new int[]{bestX,bestY};
 	}
 	
@@ -264,7 +272,7 @@ public class StrategicMap {
 	
 	public void render() {
 		
-		//update(xXx,yYy,warumGehtDieScheißeNichtHäääää);
+
 		
 		int offsetX = 0;
 		int offsetY = 0;
