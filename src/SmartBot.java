@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import lenz.htw.zpifub.Update;
@@ -39,6 +40,21 @@ public class SmartBot implements Runnable {
 			e.printStackTrace();
 		}
 
+//Das ist irgendwie neu=======
+		int counter= 0;
+		
+		map.add(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],1024);
+		map.update(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],1024);
+		Thread heatmapUpdateThread = new Thread(new ScoreHeatmapUpdateThread(this.playerNumber, this.boardConfig));
+		List<Thread> botThreads = new ArrayList<>();
+		heatmapUpdateThread.start();
+		botThreads.add(new Thread(new BrushThread(this.boardConfig, this.playerNumber)));
+		for (Thread t: botThreads) {
+			System.out.println(this.boardConfig);
+			t.start();
+		}
+//>>>>>>> 78de7b52c5319c3af36c9c4956230a063bd83237
+
 		this.pencilBot = new PencilBot(playerNumber,this.boardConfig);
 		this.pencilThread = new Thread(pencilBot);
 		this.pencilThread.start();
@@ -60,6 +76,8 @@ public class SmartBot implements Runnable {
 			if (update.type == null) {
 				this.boardConfig.moveBot(update.player, update.bot, update.x, update.y);
 			} else if (update.player == -1) {
+
+				// update spawned, type, position
 
 			} else {
 				// update collected

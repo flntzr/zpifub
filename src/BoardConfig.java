@@ -6,13 +6,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 public class BoardConfig {
+
 	public int[][][] walklayer;
 	public int[][][] debuglayer;
+
+	/** [layer][x][y] */
 	public int[][][] layer;
-	public int[][][] bots; // [player number][bot number][pixelArray index]
+	/** [layer][x][y] */
+	public int[][][] scoreHeatmap;
+	/** [player number][bot number][pixelArray index] */
+	public int[][][] bots;
 	public final int[] influenceRadii;
 
 	public BoardConfig(int[] influenceRadii) {
@@ -92,7 +97,8 @@ public class BoardConfig {
 				openSet.sort(new Comparator<Integer>() {
 					@Override
 					public int compare(Integer o1, Integer o2) {
-						return fScore.getOrDefault(o1, Double.MAX_VALUE).compareTo(fScore.getOrDefault(o2, Double.MAX_VALUE));
+						return fScore.getOrDefault(o1, Double.MAX_VALUE)
+								.compareTo(fScore.getOrDefault(o2, Double.MAX_VALUE));
 					}
 				});
 			}
@@ -104,7 +110,8 @@ public class BoardConfig {
 		int boardSize = Util.BOARD_SIZE >> layer;
 		int distanceX = (start % boardSize) - (goal % boardSize);
 		int distanceY = (start / boardSize) - (goal / boardSize);
-		return Math.sqrt(distanceX * distanceX + distanceY * distanceY); // euclidian distance
+		// System.out.println("x,y: " + distanceX+","+distanceY);
+		return Math.sqrt(distanceX * distanceX + distanceY * distanceY); // euclidean distance
 	}
 
 	private List<Integer> reconstructPath(Map<Integer, Integer> cameFrom, int current) {
@@ -135,5 +142,15 @@ public class BoardConfig {
 			}
 		}
 		return neighbors;
+	}
+
+	public int getColorScore(int x, int y, int size, int layer, int playerID) {
+		int score = 0;
+		for (int posY = 0; posY < size; posY++) {
+			for (int posX = 0; posX < size; posX++) {
+				score += Util.getColorScore(playerID, this.layer[layer][x + posX][y + posY]);
+			}
+		}
+		return score;
 	}
 }
