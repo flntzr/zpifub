@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.List;
 
 import lenz.htw.zpifub.Update;
@@ -10,6 +11,10 @@ public class SmartBot implements Runnable {
 	private int playerNumber;
 	private BoardConfig boardConfig;
 	private StrategicMap map;
+	private NetworkClient client;
+	
+	private Thread pencilThread;
+	PencilBot pencilBot;
 
 	public SmartBot(String hostname, String name, String winMessage) {
 		this.hostname = hostname;
@@ -19,32 +24,31 @@ public class SmartBot implements Runnable {
 
 	@Override
 	public void run() {
-		NetworkClient client = new NetworkClient(this.hostname, this.name, this.winMessage);
+		this.client = new NetworkClient(this.hostname, this.name, this.winMessage);
 		this.playerNumber = client.getMyPlayerNumber();
 		this.boardConfig = Util.getInitialBoard(client);
 		this.map = new StrategicMap(client, this.boardConfig, name == "smart1");
 		Update update;
 		client.setMoveDirection(0, 1, 1); // bot 0 go up-right
-		client.setMoveDirection(1, 1, -1); // bot 1 go down-right
+//		client.setMoveDirection(1, 1, -1); // bot 1 go down-right
 		client.setMoveDirection(2, -1, 0); // bot 2 go left
-		boolean debugRunning = false;
+
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
+		this.pencilBot = new PencilBot(playerNumber,this.boardConfig);
+		this.pencilThread = new Thread(pencilBot);
+		this.pencilThread.start();
+		
+		
 		map.initWalkMap();
 		map.add(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],1024);
 		map.update(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],1024);
 		while (true) {
-			map.add(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],1024);
-			map.update(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],1024);
 
-
-
-//			map.render();
-			map.renderWalkMap();
 			if ((update = client.pullNextUpdate()) == null) {
 				try {
 					Thread.sleep(20);
@@ -54,21 +58,9 @@ public class SmartBot implements Runnable {
 				continue;
 			}
 			if (update.type == null) {
-				// System.out.println(this.playerNumber + ": " + "Bot " + update.bot + " of
-				// player " + update.player
-				// + " at " + update.x + ", " + update.y);
 				this.boardConfig.moveBot(update.player, update.bot, update.x, update.y);
 			} else if (update.player == -1) {
-				// update spawned, type, position
-				// System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", "
-				// + update.y);
-				if (!debugRunning) {
-					debugRunning = true;
-					System.out.println("Start A*");
-					List<Integer> path = this.boardConfig.aStar(20*64+10,
-							 40*64+40, 4);
-					System.out.println(path);
-				}
+
 			} else {
 				// update collected
 				// System.out.println("update!");
@@ -80,7 +72,25 @@ public class SmartBot implements Runnable {
 					continue;
 				}
 			}
+			
+			map.add(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],1024);
+			map.update(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],1024);
+			
+			//Spray
+			//int[] direction = this.sprayBot.getMoveDirection();
+			//client.setMoveDirection(1, direction[0], direction[1]);
+			
+			//Pencil
+			int[] direction = this.pencilBot.getMoveDirection();
+			client.setMoveDirection(1, direction[0], direction[1]);
+
+			//Broad Brush
+			//int[] direction = this.broadBrushBot.getMoveDirection();
+			//client.setMoveDirection(2, direction[0], direction[1]);
+
+			
+			
+			//map.renderDebugMap(); //Abgeschaltet Rendern bremst die Anwendung zu Stark, Rekationszeit der Bots hängt hinterher
 		}
 	}
-
 }
