@@ -79,11 +79,11 @@ public class SmartBot implements Runnable {
 		// System.out.println("update!");
 	    }
 	    for (int i = 0; i < this.boardConfig.bots[this.playerNumber].length; i++) {
-		int[] bot = this.boardConfig.bots[this.playerNumber][i];
-		if (bot[0] == 0 && bot[1] == 0) {
-		    // Skip this special case where the bot position has not been set yet.
-		    continue;
-		}
+	    	int[] bot = this.boardConfig.bots[this.playerNumber][i];
+			if (bot[0] == 0 && bot[1] == 0) {
+			    // Skip this special case where the bot position has not been set yet.
+			    continue;
+			}
 	    }
 
 

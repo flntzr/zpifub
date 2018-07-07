@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Random;
 
 public class PencilBot implements Runnable{
@@ -34,7 +35,7 @@ public class PencilBot implements Runnable{
 			if(searching) {
 				idleMove(); //Idle wenn kein Ziel gefunden
 			} else {
-				walkToDestination(); //Erstmal direkt aufs Ziel gehen
+				walkPath(); //Erstmal direkt aufs Ziel gehen
 				//TODO: Nächster Schritt,Hier A* Einbinden und testen
 			}
 
@@ -48,16 +49,32 @@ public class PencilBot implements Runnable{
 		this.direction[1] = random.nextInt(100)-50;
 	}
 	
-	private void walkToDestination() {
-		this.direction[0] = this.destination[0] - this.board.bots[this.playerNumber][botId][0];
-		this.direction[1] = this.destination[1] - this.board.bots[this.playerNumber][botId][1];
-		int x = this.destination[0]-this.board.bots[this.playerNumber][botId][0];
-		int y = this.destination[1]-this.board.bots[this.playerNumber][botId][1];
+	int pathIndex;
+	int[] pathCoords;
+	
+	private void walkPath(){
+		int id = pathIndex*2;
+		if(walkToDestination(pathCoords[id],pathCoords[id+1],8)){
+			pathIndex++;
+			System.out.println("next Step");
+		}
+		
+		if(pathIndex*2>=pathCoords.length){
+			searching = true;			
+		}
+	}
+	
+	private boolean walkToDestination(int destX, int destY, int range) {
+		this.direction[0] = destX - this.board.bots[this.playerNumber][botId][0];
+		this.direction[1] = destY - this.board.bots[this.playerNumber][botId][1];
+		int x = destX - this.board.bots[this.playerNumber][botId][0];
+		int y = destY - this.board.bots[this.playerNumber][botId][1];
 		double length = Math.sqrt(x*x+y*y);
 
-		if( length < 32 ) {
-			searching = true;
-		};
+		if( length < range ) {
+			return true;
+		}
+		return false;
 		
 	}
 	
@@ -122,6 +139,7 @@ public class PencilBot implements Runnable{
 ////		}
 //	}
 
+	
 	class GoalSearch implements Runnable{
 		int lastX = 0;
 		int lastY = 0;
@@ -129,18 +147,42 @@ public class PencilBot implements Runnable{
 		public GoalSearch() {
 
 		}
-		
+
 		@Override
 		public void run() {
 			while(true) {
 				if(searching) {
 					searchDestination();
+					pathCoords = getPathToDestination();
+					pathIndex = 0;
 					searching = false;
 				} else{
 					restartSearchIfNoMoveHappendInMilliseconds(1000);
 				}
 
 			}			
+		}
+		
+		private void searchDestination() {
+			int layer = 0;
+			do {
+				//Erstmal nur Random ein begehbares Ziel suchen
+				//TODO: Hier mit Bewertungsfunktion suchen
+				destination[0] = random.nextInt(board.layer[layer].length);
+				destination[1] = random.nextInt(board.layer[layer].length);
+			} while(board.layer[layer][destination[0]][destination[1]]==0);
+
+		}
+		
+		private int[] getPathToDestination(){			
+			List<Integer> path = board.aStar(board.bots[playerNumber][botId][0], board.bots[playerNumber][botId][1], destination[0], destination[1], 4);
+			int[] coords = new int[path.size()*2];
+			for(int i = 0; i < path.size(); i++){
+				coords[i*2] = path.get(i)%64; 	//TODO sollte layerunabhägig sein
+				coords[i*2 + 1] = path.get(i)/64;//TODO sollte layerunabhägig sein
+			}
+			System.out.println(coords.length+"Length");
+			return coords;
 		}
 		
 		private void restartSearchIfNoMoveHappendInMilliseconds(int milliseconds){
@@ -157,18 +199,7 @@ public class PencilBot implements Runnable{
 				lastY = board.bots[playerNumber][botId][1];
 				timeOfLastMove=System.currentTimeMillis();
 			}
-			System.out.println(System.currentTimeMillis()-timeOfLastMove);
-		}
-		
-		private void searchDestination() {
-			int layer = 0;
-			do {
-				//Erstmal nur Random ein begehbares Ziel suchen
-				//TODO: Hier mit Bewertungsfunktion suchen
-				destination[0] = random.nextInt(board.layer[layer].length);
-				destination[1] = random.nextInt(board.layer[layer].length);
-			} while(board.layer[layer][destination[0]][destination[1]]==0);
-
+			//System.out.println(System.currentTimeMillis()-timeOfLastMove);
 		}
 	}
 }
