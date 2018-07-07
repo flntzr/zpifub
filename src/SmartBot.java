@@ -87,9 +87,10 @@ public class SmartBot implements Runnable {
 		}
 	    }
 
-	    for (BotInterface bot : this.boardConfig.botInstances) {
+	    for (int i  = 0; i < 3; i++) {
+		BotInterface bot= this.boardConfig.botInstances.get(i);
 		int[] direction = bot.getMoveDirection();
-		client.setMoveDirection(1, direction[0], direction[1]);
+		client.setMoveDirection(i, direction[0], direction[1]);
 	    }
 	}
     }
