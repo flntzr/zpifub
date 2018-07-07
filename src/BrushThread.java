@@ -22,13 +22,7 @@ public class BrushThread implements Runnable {
 	// find the highest scored tile to go to
 	int[] startPos = this.boardConfig.bots[this.playerID][BOT_ID];
 	int[] goalPos = this.findTargetPosition();
-	int[] translatedStartPos =  new int[2];
-	translatedStartPos[0] = startPos[0] >> A_STAR_LAYER;
-	translatedStartPos[1] = startPos[1] >> A_STAR_LAYER;
-	int[] translatedGoalPos =  new int[2];
-	translatedGoalPos[0] = goalPos[0] >> A_STAR_LAYER;
-	translatedGoalPos[1] = goalPos[1] >> A_STAR_LAYER;
-	this.boardConfig.aStar(translatedStartPos, translatedGoalPos, A_STAR_LAYER);
+	this.boardConfig.aStar(startPos[0] >> A_STAR_LAYER, startPos[1] >> A_STAR_LAYER,  goalPos[0] >> A_STAR_LAYER,  goalPos[1] >> A_STAR_LAYER, A_STAR_LAYER);
     }
 
     private int[] findTargetPosition() {

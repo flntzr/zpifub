@@ -11,7 +11,8 @@ public class SmartBot implements Runnable {
     private int playerNumber;
     private BoardConfig boardConfig;
     private StrategicMap map;
-    public int[][] botDirections = { { 1, 1 }, { 1, -1 }, { -1, 0 } };
+    private Thread pencilThread;
+    PencilBot pencilBot;
 
     public SmartBot(String hostname, String name, String winMessage) {
 	this.hostname = hostname;
@@ -26,16 +27,16 @@ public class SmartBot implements Runnable {
 	this.boardConfig = Util.getInitialBoard(client);
 	this.map = new StrategicMap(client, this.boardConfig, name == "smart1");
 	Update update;
-	client.setMoveDirection(0, this.botDirections[0][0], this.botDirections[0][1]); // bot 0 go up-right
-	client.setMoveDirection(1, 1, -1); // bot 1 go down-right
+	client.setMoveDirection(0, 1, 1); // bot 0 go up-right
+	// client.setMoveDirection(1, 1, -1); // bot 1 go down-right
 	client.setMoveDirection(2, -1, 0); // bot 2 go left
 	try {
 	    Thread.sleep(1000);
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
 	}
-	int counter = 0;
 
+	map.initWalkMap();
 	map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
 	map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
 	Thread heatmapUpdateThread = new Thread(new ScoreHeatmapUpdateThread(this.playerNumber, this.boardConfig));
@@ -46,40 +47,16 @@ public class SmartBot implements Runnable {
 	    System.out.println(this.boardConfig);
 	    t.start();
 	}
+	this.pencilBot = new PencilBot(playerNumber, this.boardConfig);
+	this.pencilThread = new Thread(pencilBot);
+	this.pencilThread.start();
 
 	while (true) {
 	    map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
 	    map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
 	    // TODO only update direction if it has changed
-	    client.setMoveDirection(0, this.botDirections[0][0], this.botDirections[0][1]);
-	    // if(true){
-	    //
-	    // map.add(this.boardConfig.bots[0][0][0],this.boardConfig.bots[0][0][1],128);
-	    // map.add(this.boardConfig.bots[0][1][0],this.boardConfig.bots[0][1][1],128);
-	    // map.add(this.boardConfig.bots[0][2][0],this.boardConfig.bots[0][2][1],128);
-	    //
-	    // map.add(this.boardConfig.bots[1][0][0],this.boardConfig.bots[1][0][1],128);
-	    // map.add(this.boardConfig.bots[1][1][0],this.boardConfig.bots[1][1][1],128);
-	    // map.add(this.boardConfig.bots[1][2][0],this.boardConfig.bots[1][2][1],128);
-	    //
-	    // map.add(this.boardConfig.bots[2][0][0],this.boardConfig.bots[2][0][1],128);
-	    // map.add(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],128);
-	    // map.add(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],128);
-	    //
-	    // map.update(this.boardConfig.bots[0][0][0],this.boardConfig.bots[0][0][1],128);
-	    // map.update(this.boardConfig.bots[0][1][0],this.boardConfig.bots[0][1][1],128);
-	    // map.update(this.boardConfig.bots[0][2][0],this.boardConfig.bots[0][2][1],128);
-	    //
-	    // map.update(this.boardConfig.bots[1][0][0],this.boardConfig.bots[1][0][1],128);
-	    // map.update(this.boardConfig.bots[1][1][0],this.boardConfig.bots[1][1][1],128);
-	    // map.update(this.boardConfig.bots[1][2][0],this.boardConfig.bots[1][2][1],128);
-	    //
-	    // map.update(this.boardConfig.bots[2][0][0],this.boardConfig.bots[2][0][1],128);
-	    // map.update(this.boardConfig.bots[2][1][0],this.boardConfig.bots[2][1][1],128);
-	    // map.update(this.boardConfig.bots[2][2][0],this.boardConfig.bots[2][2][1],128);
-	    // }
 
-	    map.render();
+//	    map.render();
 	    if ((update = client.pullNextUpdate()) == null) {
 		try {
 		    Thread.sleep(20);
@@ -108,7 +85,19 @@ public class SmartBot implements Runnable {
 		    continue;
 		}
 	    }
+
+
+	    // Spray
+	    // int[] direction = this.sprayBot.getMoveDirection();
+	    // client.setMoveDirection(1, direction[0], direction[1]);
+
+	    // Pencil
+	    int[] direction = this.pencilBot.getMoveDirection();
+	    client.setMoveDirection(1, direction[0], direction[1]);
+
+	    // Broad Brush
+	    // int[] direction = this.broadBrushBot.getMoveDirection();
+	    // client.setMoveDirection(2, direction[0], direction[1]);
 	}
     }
-
 }
