@@ -45,6 +45,12 @@ public class BoardConfig {
 		return this.getColor(layer, index) != 0;
 	}
 
+	public List<Integer> aStar(int x, int y, int destX, int destY, int layer){
+		int start = x+(y*Util.BOARD_SIZE>>layer);
+		int dest = destX+destY*(Util.BOARD_SIZE>>layer);
+		return aStar(start,dest,layer);
+	}
+	
 	public List<Integer> aStar(int start, int goal, int layer) {
 		int boardSize = Util.BOARD_SIZE >> layer;
 		Set<Integer> closedSet = new HashSet<>();
