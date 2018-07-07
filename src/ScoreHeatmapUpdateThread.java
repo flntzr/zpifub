@@ -15,6 +15,7 @@ public class ScoreHeatmapUpdateThread implements Runnable {
 		int runtime = 0;
 		while (runtime < gameRuntime + 10) {
 			this.refreshScoreLayers();
+			this.config.isScoreHeatmapInitialized = true;
 			try {
 				Thread.sleep(refreshInterval * 1000);
 			} catch (InterruptedException e) {

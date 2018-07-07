@@ -12,7 +12,9 @@ public class BoardConfig {
 	public int[][][] layer;
 	/** [layer][x][y] */
 	public int[][][] scoreHeatmap;
-	/** [player number][bot number][pixelArray index] */
+	/** If the score heatmap has been initialized yet. */
+	public boolean isScoreHeatmapInitialized = false;
+	/** [player number][bot number][x, y] */
 	public int[][][] bots;
 	public final int[] influenceRadii;
 
@@ -45,30 +47,49 @@ public class BoardConfig {
 	public boolean isWalkable(int layer, int index) {
 		return this.getColor(layer, index) != 0;
 	}
+	
+	/**
+	 * Accepts start and goal position in the context of the specified layer, e.g. in layer 4 x and y must be < 64.
+	 * @param start [x,y]
+	 * @param goal [x,y]
+	 * @param layerN
+	 * @return
+	 */
+	public List<Integer> aStar(int[] start, int[] goal, int layerN) {
+	    int boardSize = Util.BOARD_SIZE >> layerN;
+	    return this.aStar(start[1] * boardSize + start[0], goal[1] * boardSize + goal[0], layerN);
+	}
 
-	public List<Integer> aStar(int start, int goal, int layer) {
-		int boardSize = Util.BOARD_SIZE >> layer;
+	/**
+	 * Accepts start and goal position in the context of the specified layer, e.g. in layer 4 x and y must be < 64.
+	 * @param startIndex
+	 * @param goalIndex
+	 * @param layerN
+	 * @return
+	 */
+	public List<Integer> aStar(int startIndex, int goalIndex, int layerN) {
+		int boardSize = Util.BOARD_SIZE >> layerN;
 		Set<Integer> closedSet = new HashSet<>();
 		Map<Integer, Integer> cameFrom = new HashMap<>(); // most efficient previous step
 		Map<Integer, Double> gScore = new HashMap<>(); // each node with cost it takes to reach from previous node
 		Map<Integer, Double> fScore = new HashMap<>(); // each node with cost it takes to reach from the start
 		List<Integer> openSet = new ArrayList<>();
-		openSet.add(start);
+		openSet.add(startIndex);
 		for (int i = 0; i < (boardSize * boardSize); i++) {
 			gScore.put(i, Double.MAX_VALUE);
 			fScore.put(i, Double.MAX_VALUE);
 		}
-		gScore.put(start, 0d); // cost to start = 0
-		fScore.put(start, this.estimateCost(start, goal, layer));
+		gScore.put(startIndex, 0d); // cost to start = 0
+		fScore.put(startIndex, this.estimateCost(startIndex, goalIndex, layerN));
 		while (!openSet.isEmpty()) {
 			int current = openSet.get(0); // openSet is sorted ascending by fScore -> always get lowest
-			if (current == goal) {
+			if (current == goalIndex) {
 				return reconstructPath(cameFrom, current);
 			}
 			openSet.remove(0);
 			closedSet.add(current);
 
-			for (int neighbor : this.getWalkableNeighbors(layer, current, boardSize)) {
+			for (int neighbor : this.getWalkableNeighbors(layerN, current, boardSize)) {
 				if (closedSet.contains(neighbor)) {
 					continue;
 				}
@@ -76,14 +97,14 @@ public class BoardConfig {
 					openSet.add(neighbor);
 				}
 				// distance from start to neighbor
-				double tentativeGScore = gScore.get(current) + this.estimateCost(current, neighbor, layer);
+				double tentativeGScore = gScore.get(current) + this.estimateCost(current, neighbor, layerN);
 				if (tentativeGScore >= gScore.get(neighbor)) {
 					continue; // This path isn't better
 				}
 				// This path is better -> record it
 				cameFrom.put(neighbor, current);
 				gScore.put(neighbor, tentativeGScore);
-				fScore.put(neighbor, gScore.get(neighbor) + this.estimateCost(neighbor, goal, layer));
+				fScore.put(neighbor, gScore.get(neighbor) + this.estimateCost(neighbor, goalIndex, layerN));
 				openSet.sort(new Comparator<Integer>() {
 					@Override
 					public int compare(Integer o1, Integer o2) {
