@@ -55,18 +55,19 @@ public class BoardConfig {
 
     public int[] aStar(int x, int y, int destX, int destY, int layer) {
 		int layerSize = Util.BOARD_SIZE >> layer;
-//		int start = (y >> layer) * (Util.BOARD_SIZE >> 4) + (x >> layer);
-//		int dest = (destY >> layer) * (Util.BOARD_SIZE >> 4) + (destX >> layer);
-		int start = (y / layerSize) * (1 << layer) + (x / layerSize);
-		int dest = (destY / layerSize) * (1 << layer) + (destX / layerSize);
+		int start = (y >> layer) * (Util.BOARD_SIZE >> 4) + (x >> layer);
+		int dest = (destY >> layer) * (Util.BOARD_SIZE >> 4) + (destX >> layer);
+//		int start = (y / layerSize) * (1 << layer) + (x / layerSize);
+//		int dest = (destY / layerSize) * (1 << layer) + (destX / layerSize);
 		
 		List<Integer> path = aStar(start, dest, layer);
-		int[] result = new int[path.size()];
-		for (int i = 0; i < result.length; i++) {
+		int[] result = new int[path.size()*2];
+		for (int i = 0; i < result.length>>1; i++) {
 		    int step = path.get(i);
-		    int stepLayerX = step % Util.BOARD_SIZE;
-		    int stepLayerY = step / Util.BOARD_SIZE;
-		    result[i] = (stepLayerY << layer) * Util.BOARD_SIZE + (stepLayerX << layer);
+		    int stepLayerX = step % layerSize;
+		    int stepLayerY = step / layerSize;
+		    result[i*2] = stepLayerX * 1<<layer;
+		    result[i*2+1] = stepLayerY * 1<<layer;
 		}
 		return result;
     }
