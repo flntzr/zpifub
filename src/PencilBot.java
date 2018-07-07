@@ -31,12 +31,11 @@ public class PencilBot implements Runnable{
 		}
 		searchThread.start();
 		while(true){
-
-			if(searching) {
+			if(searching || this.pathCoords.length == 0) {
 				idleMove(); //Idle wenn kein Ziel gefunden
 			} else {
 				walkPath(); //Erstmal direkt aufs Ziel gehen
-				//TODO: Nächster Schritt,Hier A* Einbinden und testen
+				//TODO: Nï¿½chster Schritt,Hier A* Einbinden und testen
 			}
 
 		}
@@ -175,12 +174,7 @@ public class PencilBot implements Runnable{
 		}
 		
 		private int[] getPathToDestination(){			
-			List<Integer> path = board.aStar(board.bots[playerNumber][botId][0], board.bots[playerNumber][botId][1], destination[0], destination[1], 4);
-			int[] coords = new int[path.size()*2];
-			for(int i = 0; i < path.size(); i++){
-				coords[i*2] = path.get(i)%64; 	//TODO sollte layerunabhägig sein
-				coords[i*2 + 1] = path.get(i)/64;//TODO sollte layerunabhägig sein
-			}
+			int[] coords = board.aStar(board.bots[playerNumber][botId][0], board.bots[playerNumber][botId][1], destination[0], destination[1], 4);
 			System.out.println(coords.length+"Length");
 			return coords;
 		}

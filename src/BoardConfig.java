@@ -52,21 +52,31 @@ public class BoardConfig {
 	return this.getColor(layer, index) != 0;
     }
 
-    public List<Integer> aStar(int x, int y, int destX, int destY, int layer) {
-	int start = x + (y * Util.BOARD_SIZE >> layer);
-	int dest = destX + destY * (Util.BOARD_SIZE >> layer);
-	return aStar(start, dest, layer);
+    public int[] aStar(int x, int y, int destX, int destY, int layer) {
+	int layerSize = Util.BOARD_SIZE >> layer;
+	int start = (y >> layer) * (Util.BOARD_SIZE >> 4) + (x >> layer);
+	int dest = (destY >> layer) * (Util.BOARD_SIZE >> 4) + (destX >> layer);
+	List<Integer> path = aStar(start, dest, layer);
+	int[] result = new int[path.size()];
+	for (int i = 0; i < result.length; i++) {
+	    int step = path.get(i);
+	    int stepLayerX = step % Util.BOARD_SIZE;
+	    int stepLayerY = step / Util.BOARD_SIZE;
+	    result[i] = (stepLayerY << layer) * Util.BOARD_SIZE + (stepLayerX << layer);
+	}
+	return result;
     }
 
     /**
      * Accepts start and goal position in the context of the specified layer, e.g.
      * in layer 4 x and y must be < 64.
+     * 
      * @param startIndex
      * @param goalIndex
      * @param layerN
-     * @return
+     * @return the positions specific to that layer.
      */
-    public List<Integer> aStar(int startIndex, int goalIndex, int layerN) {
+    private List<Integer> aStar(int startIndex, int goalIndex, int layerN) {
 	int boardSize = Util.BOARD_SIZE >> layerN;
 	Set<Integer> closedSet = new HashSet<>();
 	Map<Integer, Integer> cameFrom = new HashMap<>(); // most efficient previous step
