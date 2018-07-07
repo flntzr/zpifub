@@ -55,10 +55,8 @@ public class BoardConfig {
 
     public int[] aStar(int x, int y, int destX, int destY, int layer) {
 		int layerSize = Util.BOARD_SIZE >> layer;
-		int start = (y >> layer) * (Util.BOARD_SIZE >> 4) + (x >> layer);
-		int dest = (destY >> layer) * (Util.BOARD_SIZE >> 4) + (destX >> layer);
-//		int start = (y / layerSize) * (1 << layer) + (x / layerSize);
-//		int dest = (destY / layerSize) * (1 << layer) + (destX / layerSize);
+		int start = (y >> layer) * (Util.BOARD_SIZE >> layer) + (x >> layer);
+		int dest = (destY >> layer) * (Util.BOARD_SIZE >> layer) + (destX >> layer);
 		
 		List<Integer> path = aStar(start, dest, layer);
 		int[] result = new int[path.size()*2];
