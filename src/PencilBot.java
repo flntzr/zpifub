@@ -144,7 +144,11 @@ public class PencilBot implements Runnable{
 		}
 		
 		private void restartSearchIfNoMoveHappendInMilliseconds(int milliseconds){
-			if(board.bots[playerNumber][botId][0]==lastX &&board.bots[playerNumber][botId][1]==lastY){
+			int x = board.bots[playerNumber][botId][0] - lastX;
+			int y = board.bots[playerNumber][botId][1] - lastY;
+			if(x < 0) x =- x;
+			if(y < 0) y =- y;
+			if(x<2 && y<2){
 				//counter++;
 				if(System.currentTimeMillis()-timeOfLastMove>milliseconds) searching = true;
 			}
