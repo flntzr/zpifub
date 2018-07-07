@@ -5,10 +5,10 @@ import java.util.Comparator;
 import java.util.List;
 
 public class BrushThread implements Runnable {
-    private final int botID = 0;
-    private final int heatmapLayer = 6; // in this layer each tile is 64px long, which approx. matches the 80px diameter
+    private static final int BOT_ID = 0;
+    private static final int HEATMAP_LAYER = 6; // in this layer each tile is 64px long, which approx. matches the 80px diameter
 					// of the brush
-    private final int aStarLayer = 4;
+    private static final int A_STAR_LAYER = 4;
     private final int playerID;
     private final BoardConfig boardConfig;
 
@@ -19,27 +19,28 @@ public class BrushThread implements Runnable {
 
     @Override
     public void run() {
-	// Requires the heatmap to be filled initially, otherwise all scores are equal.
-	// TODO find a better solution than waiting a bit.
-	try {
-	    Thread.sleep(500);
-	} catch (InterruptedException e) {
-	    e.printStackTrace();
-	}
-
 	// find the highest scored tile to go to
-	this.findTargetPosition();
+	int[] startPos = this.boardConfig.bots[this.playerID][BOT_ID];
+	int[] goalPos = this.findTargetPosition();
+	this.boardConfig.aStar(startPos[0] >> A_STAR_LAYER, startPos[1] >> A_STAR_LAYER,  goalPos[0] >> A_STAR_LAYER,  goalPos[1] >> A_STAR_LAYER, A_STAR_LAYER);
     }
 
     private int[] findTargetPosition() {
-	int heatmapSize = Util.BOARD_SIZE >> this.heatmapLayer;
+	// Wait for the heatmap to be filled initially, otherwise all scores are 0.
+	while (!this.boardConfig.isScoreHeatmapInitialized) {
+		try {
+		    Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+	}
+	int heatmapSize = Util.BOARD_SIZE >> HEATMAP_LAYER;
 	List<int[]> scores = new ArrayList<>(); // [x, y, score]
 	for (int y = 0; y < heatmapSize; y++) {
 	    for (int x = 0; x < heatmapSize; x++) {
 		int[] score = new int[3];
 		score[0] = x;
 		score[1] = y;
-		score[2] = this.boardConfig.scoreHeatmap[this.heatmapLayer][x][y];
+		score[2] = this.boardConfig.scoreHeatmap[HEATMAP_LAYER][x][y];
 		scores.add(score);
 	    }
 	}
@@ -53,9 +54,9 @@ public class BrushThread implements Runnable {
 	// TODO also take the distance into account to find the best target
 	int[] pickedScore = scores.get(0);
 	int[] position = new int[2];
-	int centerOffset = this.heatmapLayer == 0 ? 0 : 1 << (this.heatmapLayer - 1);
-	position[0] = (pickedScore[0] << this.heatmapLayer) + centerOffset;
-	position[1] = (pickedScore[1] << this.heatmapLayer) + centerOffset;
+	int centerOffset = HEATMAP_LAYER == 0 ? 0 : 1 << (HEATMAP_LAYER - 1);
+	position[0] = (pickedScore[0] << HEATMAP_LAYER) + centerOffset;
+	position[1] = (pickedScore[1] << HEATMAP_LAYER) + centerOffset;
 	return position;
     }
 
