@@ -11,8 +11,8 @@ public class SmartBot implements Runnable {
     private int playerNumber;
     private BoardConfig boardConfig;
     private StrategicMap map;
-    private Thread pencilThread;
-    PencilBot pencilBot;
+    // private Thread pencilThread;
+    // private PencilBot pencilBot;
 
     public SmartBot(String hostname, String name, String winMessage) {
 	this.hostname = hostname;
@@ -40,23 +40,21 @@ public class SmartBot implements Runnable {
 	map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
 	map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
 	Thread heatmapUpdateThread = new Thread(new ScoreHeatmapUpdateThread(this.playerNumber, this.boardConfig));
-	List<Thread> botThreads = new ArrayList<>();
 	heatmapUpdateThread.start();
-	botThreads.add(new Thread(new BrushThread(this.boardConfig, this.playerNumber)));
-	for (Thread t : botThreads) {
-	    System.out.println(this.boardConfig);
-	    t.start();
+	this.boardConfig.botInstances.add(new BrushThread(this.boardConfig, this.playerNumber));
+	this.boardConfig.botInstances.add(new PencilBot(playerNumber, this.boardConfig));
+	this.boardConfig.botInstances.add(new WidePencilBot());
+	for (int i = 0; i < 3; i++) {
+	    this.boardConfig.botThreads.add(new Thread(this.boardConfig.botInstances.get(i)));
+	    this.boardConfig.botThreads.get(i).start();
 	}
-	this.pencilBot = new PencilBot(playerNumber, this.boardConfig);
-	this.pencilThread = new Thread(pencilBot);
-	this.pencilThread.start();
 
 	while (true) {
 	    map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
 	    map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
 	    // TODO only update direction if it has changed
 
-//	    map.render();
+	    // map.render();
 	    if ((update = client.pullNextUpdate()) == null) {
 		try {
 		    Thread.sleep(20);
@@ -74,30 +72,25 @@ public class SmartBot implements Runnable {
 		// update spawned, type, position
 		// System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", "
 		// + update.y);
+		PowerupThread powerupThread = new PowerupThread(this.boardConfig, update.x, update.y, update.type,
+			this.playerNumber);
+		new Thread(powerupThread).start();
 	    } else {
 		// update collected
 		// System.out.println("update!");
 	    }
 	    for (int i = 0; i < this.boardConfig.bots[this.playerNumber].length; i++) {
-	    	int[] bot = this.boardConfig.bots[this.playerNumber][i];
-			if (bot[0] == 0 && bot[1] == 0) {
-			    // Skip this special case where the bot position has not been set yet.
-			    continue;
-			}
+		int[] bot = this.boardConfig.bots[this.playerNumber][i];
+		if (bot[0] == 0 && bot[1] == 0) {
+		    // Skip this special case where the bot position has not been set yet.
+		    continue;
+		}
 	    }
 
-
-	    // Spray
-	    // int[] direction = this.sprayBot.getMoveDirection();
-	    // client.setMoveDirection(1, direction[0], direction[1]);
-
-	    // Pencil
-	    int[] direction = this.pencilBot.getMoveDirection();
-	    client.setMoveDirection(1, direction[0], direction[1]);
-
-	    // Broad Brush
-	    // int[] direction = this.broadBrushBot.getMoveDirection();
-	    // client.setMoveDirection(2, direction[0], direction[1]);
+	    for (BotInterface bot : this.boardConfig.botInstances) {
+		int[] direction = bot.getMoveDirection();
+		client.setMoveDirection(1, direction[0], direction[1]);
+	    }
 	}
     }
 }

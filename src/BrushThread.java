@@ -4,13 +4,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class BrushThread implements Runnable {
+public class BrushThread implements Runnable, BotInterface {
     private static final int BOT_ID = 0;
-    private static final int HEATMAP_LAYER = 6; // in this layer each tile is 64px long, which approx. matches the 80px diameter
-					// of the brush
+    private static final int HEATMAP_LAYER = 6; // in this layer each tile is 64px long, which approx. matches the 80px
+						// diameter
+    // of the brush
     private static final int A_STAR_LAYER = 4;
     private final int playerID;
     private final BoardConfig boardConfig;
+
+    private final int[] debugMoveDirection = { 1, 1 };
 
     public BrushThread(BoardConfig boardConfig, int playerID) {
 	this.boardConfig = boardConfig;
@@ -22,16 +25,16 @@ public class BrushThread implements Runnable {
 	// find the highest scored tile to go to
 	int[] startPos = this.boardConfig.bots[this.playerID][BOT_ID];
 	int[] goalPos = this.findTargetPosition();
-	int[] path = this.boardConfig.aStar(startPos[0], startPos[1],  goalPos[0],  goalPos[1], A_STAR_LAYER);
+	int[] path = this.boardConfig.aStar(startPos[0], startPos[1], goalPos[0], goalPos[1], A_STAR_LAYER);
     }
 
     private int[] findTargetPosition() {
 	// Wait for the heatmap to be filled initially, otherwise all scores are 0.
 	while (!this.boardConfig.isScoreHeatmapInitialized) {
-		try {
-		    Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+	    try {
+		Thread.sleep(100);
+	    } catch (InterruptedException e) {
+	    }
 	}
 	int heatmapSize = Util.BOARD_SIZE >> HEATMAP_LAYER;
 	List<int[]> scores = new ArrayList<>(); // [x, y, score]
@@ -58,6 +61,17 @@ public class BrushThread implements Runnable {
 	position[0] = (pickedScore[0] << HEATMAP_LAYER) + centerOffset;
 	position[1] = (pickedScore[1] << HEATMAP_LAYER) + centerOffset;
 	return position;
+    }
+
+    @Override
+    public void collectPowerUp(int[] path) {
+	// TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public int[] getMoveDirection() {
+	return debugMoveDirection;
     }
 
 }

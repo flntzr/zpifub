@@ -21,13 +21,14 @@ public class BoardConfig {
     /** [player number][bot number][x, y] */
     public int[][][] bots;
     public final int[] influenceRadii;
+    public List<BotInterface> botInstances;
+    public List<Thread> botThreads;
 
     public BoardConfig(int[] influenceRadii) {
-	// this.pixelArray = new int[Util.BOARD_SIZE * Util.BOARD_SIZE];
-	// System.arraycopy(pixelArray, 0, this.pixelArray, 0, Util.BOARD_SIZE *
-	// Util.BOARD_SIZE);
 	this.bots = new int[3][3][2]; // 3 players, 3 bots, 2 coordinates
 	this.influenceRadii = influenceRadii;
+	this.botInstances = new ArrayList<>();
+	this.botThreads = new ArrayList<>();
     }
 
     public void moveBot(int playerID, int botID, int x, int y) {

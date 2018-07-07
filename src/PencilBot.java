@@ -1,7 +1,7 @@
 import java.util.List;
 import java.util.Random;
 
-public class PencilBot implements Runnable{
+public class PencilBot implements Runnable, BotInterface{
 
 	public int[] direction;
 	private Random random;
@@ -195,5 +195,11 @@ public class PencilBot implements Runnable{
 			}
 			//System.out.println(System.currentTimeMillis()-timeOfLastMove);
 		}
+	}
+
+	@Override
+	public void collectPowerUp(int[] path) {
+	    // TODO Auto-generated method stub
+	    
 	}
 }
