@@ -20,7 +20,7 @@ public class AStar {
 			finishNode = getNodeById(destNode,openList);
 			if(openList.size() == 0){
 				System.out.println("Es führt kein Weg zum Ziel");
-				return null;
+				return new int[][]{start};
 			} else if(finishNode!=null){				
 				System.out.println("Pfad gefunden");
 				break;
@@ -41,7 +41,8 @@ public class AStar {
 		
 		//Pfad bauen
 		List<int[]> revertPath = new ArrayList<>();
-		AStarNode last = getNodeById(destNode,openList);
+		AStarNode last = finishNode;
+		if(last == null) return new int[][]{start};
 		while(last.parent!=null){
 			
 			revertPath.add(last.coords);			

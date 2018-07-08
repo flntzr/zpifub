@@ -30,10 +30,32 @@ public class StrategicMap {
 	
 
 	//int[][][] layer;
-	
-	public void add(int x,int y ,int minSize){
-		refreshLayer(0,minSize,(x/minSize)*minSize,(y/minSize)*minSize);
+
+	int x = 0;
+	int y = 0;
+	int chunkSize = 0;
+	public void pullChunk(){
+		pullChunkFromServer(x,y,chunkSize);
+		x+=chunkSize;
+		if(x>=Util.BOARD_SIZE){
+			x= 0;
+			y+=chunkSize;
+			if(y>=Util.BOARD_SIZE) y= 0;
+		}
 	}
+	
+	public void pullChunkFromServer(int startX, int startY, int size) {
+		int endX = startX + size;
+		int endY = startY + size;
+		for(int x = startX; x<endX; x++){
+			for(int y = startY; y<endY; y++){
+				config.layer[0][x][y] = client.getBoard(x, y);					
+			}	
+		}
+		
+	}
+	
+
 	
 	public void update(int x,int y ,int minSize){
 		update2(x,y,0,0,1024,9,minSize);
@@ -128,14 +150,13 @@ public class StrategicMap {
 				delta = xX*xX+yY*yY;
 				if(delta<0) delta = -delta;
 
-				//delta = config.bots[gegenerA][0][0]*config.bots[gegenerA][0][0] + config.bots[gegenerA][0][1]*config.bots[gegenerA][0][1];
+
 				if(dist<delta){
 					dist = delta;
 					bestX = x;
 					bestY = y;					
 				}
-//				config.debuglayer[layer][x][y] = (int)(((delta/1.41421f)+0.5f)*255.0f);
-				//if(delta<0.5f) config.debuglayer[layer][x][y] = config.debuglayer[layer][x][y]<<8;
+
 			}
 		}
 

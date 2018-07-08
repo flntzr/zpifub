@@ -50,7 +50,8 @@ public class SmartBot implements Runnable {
 	}
 
 	while (true) {
-	    map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
+		map.pullChunk();
+//	    map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
 		map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
 	    // TODO only update direction if it has changed
 
@@ -89,11 +90,12 @@ public class SmartBot implements Runnable {
 
 
 	    for (int i  = 0; i < 3; i++) {
-		BotInterface bot= this.boardConfig.botInstances.get(i);
-		int[] direction = bot.getMoveDirection();
-		client.setMoveDirection(i, direction[0], direction[1]);
+			BotInterface bot= this.boardConfig.botInstances.get(i);
+			int[] direction = bot.getMoveDirection();
+			client.setMoveDirection(i, direction[0], direction[1]);
 
 	    }
+	    map.render();
 	}
     }
 }
