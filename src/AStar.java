@@ -1,13 +1,11 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class AStar {
 	
 	
-	public static int[][] AStar(int[] start, int[] dest, int[][] board,int boardWidth,int[][] weights) {
-		int[] pathCoords;
+	public static int[][] search(int[] start, int[] dest, int[][] board,int boardWidth,int[][] weights) {
 		List<AStarNode> openList = new ArrayList<AStarNode>();
 		List<AStarNode> closedList = new ArrayList<AStarNode>();
 
@@ -15,14 +13,14 @@ public class AStar {
 		AStarNode destNode = new AStarNode(dest,boardWidth,null);
 		openList.add(startNode);
 		AStarNode finishNode = null;
-		while(true){		
-			System.out.println("Suche...."+closedList.size()+":"+openList.size());
+		while(true){
+			//System.out.println("Suche...."+openList.size()+"..."+closedList.size());
 			finishNode = getNodeById(destNode,openList);
 			if(openList.size() == 0){
-				System.out.println("Es führt kein Weg zum Ziel");
+				//System.out.println("Es führt kein Weg zum Ziel");
 				return new int[][]{start};
 			} else if(finishNode!=null){				
-				System.out.println("Pfad gefunden");
+				//System.out.println("Pfad gefunden");
 				break;
 			}
 			
@@ -62,8 +60,6 @@ public class AStar {
 				if(board[y][x]==0) continue; //Feld ist nicht begehbar
 				AStarNode n = new AStarNode(new int[]{x,y},boardWidth,node); 
 				if(getNodeById(n,closedList)!=null) continue;
-
-				
 
 				//G-Cost
 				n.gCost = (float)Math.sqrt((node.coords[0]-x)*(node.coords[0]-x) + (node.coords[1]-y)*(node.coords[1]-y));

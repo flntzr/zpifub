@@ -1,21 +1,26 @@
-import java.util.Arrays;
 
 public class Main {
 
 	public static void main(String[] args) {		
 		
 //		int [][] board = new int[][]{
-//			{0 , 0 , 0 , 0 , 0 , 0 , 0},
-//			{0 , 0 , 0 , 1 , 0 , 0 , 0},
-//			{0 , 0 , 0 , 1 , 0 , 0 , 0},
-//			{0 , 0 , 0 , 1 , 0 , 0 , 0},
-//			{0 , 0 , 0 , 0 , 0 , 0 , 0}
+//			{0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0},
+//			{0 , 0 , 1 , 1 , 1 , 1 , 0 , 0 , 0},
+//			{0 , 1 , 0 , 0 , 1 , 1 , 0 , 0 , 0},
+//			{0 , 0 , 0 , 0 , 1 , 1 , 0 , 0 , 0},
+//			{0 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0},
+//			{0 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0},
+//			{0 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0},
+//			{0 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0},
+//			{0 , 0 , 0 , 0 , 1 , 1 , 0 , 0 , 0},
+//			{0 , 0 , 1 , 1 , 1 , 1 , 0 , 0 , 0},
+//			{0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0}
 //		};
 //		
-//		int [] start = new int[]{1,2};
-//		int [] dest = new int[]{5,2};
+//		int [] start = new int[]{4,5};
+//		int [] dest = new int[]{8,5};
 //		
-//		int[][] coords = AStar.AStar(start,dest,board,7);
+//		int[][] coords = AStar.AStar(start,dest,board,9,null);
 //		for(int i = 0; i< coords.length; i++){
 //			System.out.println(Arrays.toString(coords[i]));
 //		}

@@ -134,38 +134,6 @@ public class StrategicMap {
 		}		
 	}
 	
-	//Erster versuch basierend auf Distanz	
-	public int[] getValuableDestination(int startX, int startY,int playernumber){
-		int layer = 7;
-		int dist = Integer.MIN_VALUE;
-		int delta = 0;
-		int bestX = 0;
-		int bestY = 0;
-		int gegenerA = (playernumber+1)%3;
-		int gegenerB = (playernumber+1)%3;
-
-		for(int x = 0; x < config.walklayer[layer].length; x++){
-			for(int y = 0; y < config.walklayer[layer].length; y++){
-				if(this.config.walklayer[layer][x][y]==0)continue;
-				//Distanz �ber alle gegner figuren
-				int xX = config.bots[gegenerA][0][0]-x<<layer;
-				int yY = config.bots[gegenerA][0][1]-y<<layer;
-				delta = xX*xX+yY*yY;
-				if(delta<0) delta = -delta;
-
-
-				if(dist<delta){
-					dist = delta;
-					bestX = x;
-					bestY = y;					
-				}
-
-			}
-		}
-
-		return new int[]{bestX,bestY};
-	}
-	
 	public void initWalkMap() {
 		int size = 1024;
 		for(int x = 0; x<size; x++){
@@ -180,10 +148,7 @@ public class StrategicMap {
 		for(int layerN = 1; layerN < 10 ; layerN++){
 			int l = layerN-1;
 			for(int x = 0; x < size; x+=2){
-				for(int y = 0; y < size ; y+=2){
-					int xIn = x+xOffset;
-					int yIn = y+yOffset;
-					
+				for(int y = 0; y < size ; y+=2){					
 					if(config.walklayer[l][x][y] == 0) {
 						continue;
 					}
@@ -240,94 +205,94 @@ public class StrategicMap {
 	}
 	
 	public void renderWalkMap(){
-		//update(xXx,yYy,warumGehtDieSchei�eNichtH�����);		
-		int offsetX = 0;
-		int offsetY = 0;
-		int size = 1;
-		int offsetIncrease = 1024;		
-		for(int l = 0; l < 10; l++) {
-			if(l<5) {
-				for(int y = 0; y < config.walklayer[l].length; y+=size){
-					for(int x = 0; x < config.walklayer[l].length; x += size){			
-						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, config.walklayer[l][x][y]);
-					}
-				}
-				//size = size << 1;
-				if(l % 2 == 0) offsetX += offsetIncrease;
-				else offsetY += offsetIncrease;
-				offsetIncrease = offsetIncrease >> 1;
-			} else {
-				offsetX = 1600;
-				if(l==5 )offsetY = 0;
-				else offsetY = (l-4)*140+50;
-				for(int y = 0; y < config.walklayer[l].length*8; y++){
-					for(int x = 0; x < config.walklayer[l].length*8; x ++){			
-						mapframe.setPixel((x) + offsetX, (y) + offsetY, config.walklayer[l][x/8][y/8]);
-					}
-				}
-			}
-		}
-		mapframe.invalidate();
+//		//update(xXx,yYy,warumGehtDieSchei�eNichtH�����);		
+//		int offsetX = 0;
+//		int offsetY = 0;
+//		int size = 1;
+//		int offsetIncrease = 1024;		
+//		for(int l = 0; l < 10; l++) {
+//			if(l<5) {
+//				for(int y = 0; y < config.walklayer[l].length; y+=size){
+//					for(int x = 0; x < config.walklayer[l].length; x += size){			
+//						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, config.walklayer[l][x][y]);
+//					}
+//				}
+//				//size = size << 1;
+//				if(l % 2 == 0) offsetX += offsetIncrease;
+//				else offsetY += offsetIncrease;
+//				offsetIncrease = offsetIncrease >> 1;
+//			} else {
+//				offsetX = 1600;
+//				if(l==5 )offsetY = 0;
+//				else offsetY = (l-4)*140+50;
+//				for(int y = 0; y < config.walklayer[l].length*8; y++){
+//					for(int x = 0; x < config.walklayer[l].length*8; x ++){			
+//						mapframe.setPixel((x) + offsetX, (y) + offsetY, config.walklayer[l][x/8][y/8]);
+//					}
+//				}
+//			}
+//		}
+//		mapframe.invalidate();
 	}
 	
 	public void renderDebugMap(){
-		//update(xXx,yYy,warumGehtDieSchei�eNichtH�����);		
-		int offsetX = 0;
-		int offsetY = 0;
-		int size = 1;
-		int offsetIncrease = 1024;		
-		for(int l = 0; l < 10; l++) {
-			if(l<5) {
-				for(int y = 0; y < config.debuglayer[l].length; y+=size){
-					for(int x = 0; x < config.debuglayer[l].length; x += size){			
-						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, config.debuglayer[l][x][y]);
-					}
-				}
-				//size = size << 1;
-				if(l % 2 == 0) offsetX += offsetIncrease;
-				else offsetY += offsetIncrease;
-				offsetIncrease = offsetIncrease >> 1;
-			} else {
-				offsetX = 1600;
-				if(l==5 )offsetY = 0;
-				else offsetY = (l-4)*140+50;
-				for(int y = 0; y < config.debuglayer[l].length*8; y++){
-					for(int x = 0; x < config.debuglayer[l].length*8; x ++){			
-						mapframe.setPixel((x) + offsetX, (y) + offsetY, config.debuglayer[l][x/8][y/8]);
-					}
-				}
-			}
-		}
-		mapframe.invalidate();
+//		//update(xXx,yYy,warumGehtDieSchei�eNichtH�����);		
+//		int offsetX = 0;
+//		int offsetY = 0;
+//		int size = 1;
+//		int offsetIncrease = 1024;		
+//		for(int l = 0; l < 10; l++) {
+//			if(l<5) {
+//				for(int y = 0; y < config.debuglayer[l].length; y+=size){
+//					for(int x = 0; x < config.debuglayer[l].length; x += size){			
+//						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, config.debuglayer[l][x][y]);
+//					}
+//				}
+//				//size = size << 1;
+//				if(l % 2 == 0) offsetX += offsetIncrease;
+//				else offsetY += offsetIncrease;
+//				offsetIncrease = offsetIncrease >> 1;
+//			} else {
+//				offsetX = 1600;
+//				if(l==5 )offsetY = 0;
+//				else offsetY = (l-4)*140+50;
+//				for(int y = 0; y < config.debuglayer[l].length*8; y++){
+//					for(int x = 0; x < config.debuglayer[l].length*8; x ++){			
+//						mapframe.setPixel((x) + offsetX, (y) + offsetY, config.debuglayer[l][x/8][y/8]);
+//					}
+//				}
+//			}
+//		}
+//		mapframe.invalidate();
 	}
 	
 	public void render() {		
-		int offsetX = 0;
-		int offsetY = 0;
-		int size = 1;
-		int offsetIncrease = 1024;		
-		for(int l = 0; l < 10; l++) {
-			if(l<5) {
-				for(int y = 0; y < config.scoreHeatmap[l].length; y+=size){
-					for(int x = 0; x < config.scoreHeatmap[l].length; x += size){			
-						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, config.scoreHeatmap[l][x][y]);
-					}
-				}
-				//size = size << 1;
-				if(l % 2 == 0) offsetX += offsetIncrease;
-				else offsetY += offsetIncrease;
-				offsetIncrease = offsetIncrease >> 1;
-			} else {
-				offsetX = 1600;
-				if(l==5 )offsetY = 0;
-				else offsetY = (l-4)*140+50;
-				for(int y = 0; y < config.scoreHeatmap[l].length*8; y++){
-					for(int x = 0; x < config.scoreHeatmap[l].length*8; x ++){			
-						mapframe.setPixel((x) + offsetX, (y) + offsetY, config.scoreHeatmap[l][x/8][y/8]);
-					}
-				}
-			}
-		}
-		mapframe.invalidate();
+//		int offsetX = 0;
+//		int offsetY = 0;
+//		int size = 1;
+//		int offsetIncrease = 1024;		
+//		for(int l = 0; l < 10; l++) {
+//			if(l<5) {
+//				for(int y = 0; y < config.scoreHeatmap[l].length; y+=size){
+//					for(int x = 0; x < config.scoreHeatmap[l].length; x += size){			
+//						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, config.scoreHeatmap[l][x][y]);
+//					}
+//				}
+//				//size = size << 1;
+//				if(l % 2 == 0) offsetX += offsetIncrease;
+//				else offsetY += offsetIncrease;
+//				offsetIncrease = offsetIncrease >> 1;
+//			} else {
+//				offsetX = 1600;
+//				if(l==5 )offsetY = 0;
+//				else offsetY = (l-4)*140+50;
+//				for(int y = 0; y < config.scoreHeatmap[l].length*8; y++){
+//					for(int x = 0; x < config.scoreHeatmap[l].length*8; x ++){			
+//						mapframe.setPixel((x) + offsetX, (y) + offsetY, config.scoreHeatmap[l][x/8][y/8]);
+//					}
+//				}
+//			}
+//		}
+//		mapframe.invalidate();
 	}
 }

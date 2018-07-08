@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 import lenz.htw.zpifub.Update;
 import lenz.htw.zpifub.net.NetworkClient;
 
@@ -50,8 +47,9 @@ public class SmartBot implements Runnable {
 
 	this.boardConfig.botInstances.add(new BasicBot(playerNumber, this.boardConfig, 0, new SprayBehaviour()));
 	this.boardConfig.botInstances.add(new BasicBot(playerNumber, this.boardConfig, 1, new PencilBehaviour()));
-	this.boardConfig.botInstances.add(new WidePencilBot());
-	for (int i = 0; i < 3; i++) {
+	this.boardConfig.botInstances.add(new BasicBot(playerNumber, this.boardConfig, 2, new WidePencilBehaviour()));
+	
+	for (int i = 0; i < this.boardConfig.botInstances.size(); i++) {
 	    this.boardConfig.botThreads.add(new Thread(this.boardConfig.botInstances.get(i)));
 	    this.boardConfig.botThreads.get(i).start();
 	}
@@ -81,13 +79,13 @@ public class SmartBot implements Runnable {
 		this.boardConfig.removeSlowPowerup(update.type, update.x, update.y);
 	    }
 	    for (int i = 0; i < this.boardConfig.bots[this.playerNumber].length; i++) {
-		int[] bot = this.boardConfig.bots[this.playerNumber][i];
-		if (bot[0] == 0 && bot[1] == 0) {
-		    // Skip this special case where the bot position has not been set yet.
-		    continue;
-		}
+	    	int[] bot = this.boardConfig.bots[this.playerNumber][i];
+			if (bot[0] == 0 && bot[1] == 0) {
+			    // Skip this special case where the bot position has not been set yet.
+			    continue;
+			}
 	    }
-	    for (int i = 0; i < 3; i++) {
+	    for (int i = 0; i < this.boardConfig.botInstances.size(); i++) {
 		BotInterface bot = this.boardConfig.botInstances.get(i);
 		int[] direction = bot.getMoveDirection();
 		client.setMoveDirection(i, direction[0], direction[1]);

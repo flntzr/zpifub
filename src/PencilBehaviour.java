@@ -16,15 +16,22 @@ class PencilBehaviour extends BotBehaviour{
 		public void run() {
 			gegnerId = (bot.playerNumber + (bot.random.nextInt(1)+1))%3;
 			botId =	bot.random.nextInt(3);
+			System.out.println(this.bot.playerNumber);
+			System.out.println(gegnerId);
+			System.out.println(botId);
+
 			while(true) {
 				if(bot.searching) {
 					System.out.println("Suche neues Ziel...");
 					searchDestination();
+
 					bot.pathCoords = getPathToDestination();
+
 					bot.pathIndex = 0;
 					bot.searching = false;
-					System.out.println(bot.searching || bot.pathCoords.length == 0);
+					//System.out.println(bot.searching || bot.pathCoords.length == 0);
 				} else{
+					//System.out.println("Test");
 					restartSearchIfNoMoveHappendInMilliseconds(1000);
 				}
 
@@ -46,8 +53,10 @@ class PencilBehaviour extends BotBehaviour{
 			int[] destNew = new int[]{bot.destination[0],bot.destination[1]};
 			destNew[0] /=(1<<bot.aStarLayer); 
 			destNew[1] /=(1<<bot.aStarLayer);
-			int[][] coords = AStar.AStar(startNew,destNew,bot.board.walklayer[bot.aStarLayer],bot.board.walklayer[bot.aStarLayer].length, bot.board.scoreHeatmap[bot.aStarLayer]);
-			for(int i = 0; i< coords.length; i++){
+			int[][] coords = AStar.search(startNew,destNew,bot.board.walklayer[bot.aStarLayer],bot.board.walklayer[bot.aStarLayer].length, bot.board.scoreHeatmap[bot.aStarLayer]);
+			System.out.println("Start"+Arrays.toString(startNew));
+			System.out.println("Ende"+Arrays.toString(destNew));
+			for(int i = 0; i<coords.length; i++){
 				System.out.println(Arrays.toString(coords[i]));
 			}
 			return coords;
@@ -60,7 +69,7 @@ class PencilBehaviour extends BotBehaviour{
 			if(x < 0) x =- x;
 			if(y < 0) y =- y;
 			if(x<2 && y<2){
-				if(System.currentTimeMillis()-timeOfLastMove>milliseconds) bot.searching = true;
+				//if(System.currentTimeMillis()-timeOfLastMove>milliseconds) bot.searching = true;
 			}
 			else{
 				lastX = bot.board.bots[bot.playerNumber][bot.botId][0];

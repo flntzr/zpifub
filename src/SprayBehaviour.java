@@ -5,80 +5,83 @@ import java.util.List;
 
 public class SprayBehaviour extends BotBehaviour {
 
-    private static final int BOT_ID = 0;
-    private static final int A_STAR_LAYER = 4;
+
+
     int lastX = 0;
     int lastY = 0;
     long timeOfLastMove = 0;
 
     public SprayBehaviour() {
-	super();
+    	super();
+
     }
 
     @Override
     public void run() {
-	while (true) {
-	    if (bot.searching) {
-		bot.destination = this.findTargetPosition();
-		bot.pathCoords = getPathToDestination();
-		bot.pathIndex = 0;
-		bot.searching = false;
-	    } else {
-		restartSearchIfNoMoveHappendInMilliseconds(1000);
-	    }
-
-	}
+    	bot.aStarLayer = 5;
+    	bot.pointReachRange = 25;
+		while (true) {
+		    if (bot.searching) {
+			bot.destination = this.findTargetPosition();
+			bot.pathCoords = getPathToDestination();
+			bot.pathIndex = 0;
+			bot.searching = false;
+		    } else {
+			restartSearchIfNoMoveHappendInMilliseconds(1000);
+		    }
+	
+		}
     }
 
     private int[][] getPathToDestination() {
 
-	int[] startNew = new int[] { bot.board.bots[bot.playerNumber][bot.botId][0],
-		bot.board.bots[bot.playerNumber][bot.botId][1] };
-	startNew[0] = startNew[0] / (1 << bot.aStarLayer);
-	startNew[1] = startNew[1] / (1 << bot.aStarLayer);
-
-	int[] destNew = new int[] { bot.destination[0], bot.destination[1] };
-	destNew[0] /= (1 << bot.aStarLayer);
-	destNew[1] /= (1 << bot.aStarLayer);
-	int[][] coords = AStar.AStar(startNew, destNew, bot.board.walklayer[bot.aStarLayer],
-		bot.board.walklayer[bot.aStarLayer].length, null);
-	return coords;
-
+		int[] startNew = new int[] { bot.board.bots[bot.playerNumber][bot.botId][0],
+			bot.board.bots[bot.playerNumber][bot.botId][1] };
+		startNew[0] = startNew[0] / (1 << bot.aStarLayer);
+		startNew[1] = startNew[1] / (1 << bot.aStarLayer);
+	
+		int[] destNew = new int[] { bot.destination[0], bot.destination[1] };
+		destNew[0] /= (1 << bot.aStarLayer);
+		destNew[1] /= (1 << bot.aStarLayer);
+		int[][] coords = AStar.search(startNew, destNew, bot.board.walklayer[bot.aStarLayer],
+			bot.board.walklayer[bot.aStarLayer].length, null);
+		return coords;
     }
 
     private void restartSearchIfNoMoveHappendInMilliseconds(int milliseconds) {
-	int x = bot.board.bots[bot.playerNumber][bot.botId][0] - lastX;
-	int y = bot.board.bots[bot.playerNumber][bot.botId][1] - lastY;
-	if (x < 0)
-	    x = -x;
-	if (y < 0)
-	    y = -y;
-	if (x < 2 && y < 2) {
-	    if (System.currentTimeMillis() - timeOfLastMove > milliseconds)
-		bot.searching = true;
-	} else {
-	    lastX = bot.board.bots[bot.playerNumber][bot.botId][0];
-	    lastY = bot.board.bots[bot.playerNumber][bot.botId][1];
-	    timeOfLastMove = System.currentTimeMillis();
-	}
+		int x = bot.board.bots[bot.playerNumber][bot.botId][0] - lastX;
+		int y = bot.board.bots[bot.playerNumber][bot.botId][1] - lastY;
+		if (x < 0) x = -x;
+		if (y < 0) y = -y;
+		if (x < 2 && y < 2) {
+		    if (System.currentTimeMillis() - timeOfLastMove > milliseconds)
+			bot.searching = true;
+		} else {
+		    lastX = bot.board.bots[bot.playerNumber][bot.botId][0];
+		    lastY = bot.board.bots[bot.playerNumber][bot.botId][1];
+		    timeOfLastMove = System.currentTimeMillis();
+		}
     }
     
     private int[] findTargetPosition() {
 	// Wait for the heatmap to be filled initially, otherwise all scores are 0.
 	while (!bot.board.isScoreHeatmapInitialized) {
 	    try {
-		Thread.sleep(100);
-	    } catch (InterruptedException e) {
+	    	Thread.sleep(100);
+	    } 
+	    catch (InterruptedException e) {
+	    	
 	    }
 	}
-	int heatmapSize = Util.BOARD_SIZE >> A_STAR_LAYER;
+	
+	int heatmapSize = Util.BOARD_SIZE >> bot.aStarLayer;
 	List<int[]> scores = new ArrayList<>(); // [x, y, score]
 	for (int y = 0; y < heatmapSize; y++) {
 	    for (int x = 0; x < heatmapSize; x++) {
 		int[] score = new int[3];
 		score[0] = x;
 		score[1] = y;
-		score[2] = bot.board.scoreHeatmap[A_STAR_LAYER][x][y];
+		score[2] = bot.board.scoreHeatmap[bot.aStarLayer][x][y];
 		scores.add(score);
 	    }
 	}
@@ -92,9 +95,9 @@ public class SprayBehaviour extends BotBehaviour {
 	// TODO also take the distance into account to find the best target
 	int[] pickedScore = scores.get(0);
 	int[] position = new int[2];
-	int centerOffset = A_STAR_LAYER == 0 ? 0 : 1 << (A_STAR_LAYER - 1);
-	position[0] = (pickedScore[0] << A_STAR_LAYER) + centerOffset;
-	position[1] = (pickedScore[1] << A_STAR_LAYER) + centerOffset;
+	int centerOffset = bot.aStarLayer == 0 ? 0 : 1 << (bot.aStarLayer - 1);
+	position[0] = (pickedScore[0] << bot.aStarLayer) + centerOffset;
+	position[1] = (pickedScore[1] << bot.aStarLayer) + centerOffset;
 	return position;
     }
 }

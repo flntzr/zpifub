@@ -1,5 +1,3 @@
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 public class BasicBot implements Runnable, BotInterface{
@@ -12,7 +10,7 @@ public class BasicBot implements Runnable, BotInterface{
 	public Thread searchThread;
 	public int[] destination = new int[]{0,0};
 	public int aStarLayer = 4;
-	public int pointReachRange = 5; //Reichweite ab wann ein Punkt erreicht wurde
+	public int pointReachRange = 25; //Reichweite ab wann ein Punkt erreicht wurde
 	public boolean searching = true;
 	public int pathIndex;
 	public int[][] pathCoords;
@@ -64,9 +62,9 @@ public class BasicBot implements Runnable, BotInterface{
 		
 		if(walkToDestination(pathCoords[pathIndex][0]*(1<<aStarLayer),pathCoords[pathIndex][1]*(1<<aStarLayer),pointReachRange)){
 			pathIndex++;
-			System.out.println("next Step");
+			//System.out.println("next Step");
 			if(pathIndex>=pathCoords.length){
-				System.out.println("Pfad beendet");
+				//System.out.println("Pfad beendet");
 				searching = true;			
 			}
 		}
@@ -74,7 +72,7 @@ public class BasicBot implements Runnable, BotInterface{
 		//System.out.println(pathIndex+":"+pathCoords.length);
 		if(pathIndex>=pathCoords.length){
 			searching = true;
-			System.out.println("Pfad beendet");
+			//System.out.println("Pfad beendet");
 		}
 	}
 	
@@ -92,19 +90,6 @@ public class BasicBot implements Runnable, BotInterface{
 		}
 		return false;
 		
-	}
-
-	private void pattern() {
-		int bottom = getBottomBorder();
-	}
-	
-	private int getBottomBorder() {
-		int x = board.bots[playerNumber][botId][0];
-		int y = board.bots[playerNumber][botId][1];
-		for(int i = y; i < board.walklayer[4].length; i++) {
-			if(board.walklayer[4][x][i]==0) return i--;
-		}
-		return y;
 	}
 
 	@Override
