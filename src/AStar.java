@@ -6,7 +6,7 @@ import java.util.List;
 public class AStar {
 	
 	
-	public static int[][] AStar(int[] start, int[] dest, int[][] board,int boardWidth) {
+	public static int[][] AStar(int[] start, int[] dest, int[][] board,int boardWidth,int[][] weights) {
 		int[] pathCoords;
 		List<AStarNode> openList = new ArrayList<AStarNode>();
 		List<AStarNode> closedList = new ArrayList<AStarNode>();
@@ -15,8 +15,8 @@ public class AStar {
 		AStarNode destNode = new AStarNode(dest,boardWidth,null);
 		openList.add(startNode);
 		AStarNode finishNode = null;
-		for(int j = 0; j < 120; j++) {		
-
+		while(true){		
+			System.out.println("Suche...."+closedList.size()+":"+openList.size());
 			finishNode = getNodeById(destNode,openList);
 			if(openList.size() == 0){
 				System.out.println("Es f¸hrt kein Weg zum Ziel");
@@ -35,7 +35,7 @@ public class AStar {
 			}
 			openList.remove(cheapest);
 			closedList.add(cheapest);
-			AStar.getNeighbors(openList,closedList,cheapest,destNode,board,board[0].length,board.length);
+			AStar.getNeighbors(openList,closedList,cheapest,destNode,board,weights,board[0].length,board.length);
 			
 		}
 		
@@ -53,7 +53,7 @@ public class AStar {
 		return revertPath.toArray(new int[revertPath.size()][2]);
 	}
 	
-	public static void getNeighbors(List<AStarNode> openList,List<AStarNode> closedList, AStarNode node,AStarNode dest,int[][]board, int boardWidth, int boardHeight) {
+	public static void getNeighbors(List<AStarNode> openList,List<AStarNode> closedList, AStarNode node,AStarNode dest,int[][]board,int[][]weights, int boardWidth, int boardHeight) {
 		for(int x = node.coords[0]-1; x<=node.coords[0]+1; x++){
 			for(int y = node.coords[1]-1; y<=node.coords[1]+1; y++){
 				if(x<0 || y < 0 || x >= boardWidth || y >= boardHeight) continue; //Feld ist auﬂerhalb des Boards
@@ -66,7 +66,8 @@ public class AStar {
 				
 
 				//G-Cost
-				n.gCost = (float)Math.sqrt((node.coords[0]-x)*(node.coords[0]-x) + (node.coords[1]-y)*(node.coords[1]-y));						
+				n.gCost = (float)Math.sqrt((node.coords[0]-x)*(node.coords[0]-x) + (node.coords[1]-y)*(node.coords[1]-y));
+				if(weights!=null) n.gCost *= -weights[y][x];
 				//H-Cost
 				n.hCost = (float)Math.sqrt((dest.coords[0]-n.coords[0])*(dest.coords[0]-n.coords[0]) + (dest.coords[1]-n.coords[1])*(dest.coords[1]-n.coords[1]));
 				n.fCost = n.gCost + n.hCost;
@@ -76,7 +77,7 @@ public class AStar {
 					existingNode.gCost = n.gCost;
 					//GCost updaten wenn geringer
 				}
-				else openList.add(n);
+				else if(existingNode==null) openList.add(n);
 			}
 		}
 	}
