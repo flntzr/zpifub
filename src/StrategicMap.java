@@ -122,7 +122,7 @@ public class StrategicMap {
 		for(int x = 0; x < config.walklayer[layer].length; x++){
 			for(int y = 0; y < config.walklayer[layer].length; y++){
 				if(this.config.walklayer[layer][x][y]==0)continue;
-				//Distanz über alle gegner figuren
+				//Distanz ï¿½ber alle gegner figuren
 				int xX = config.bots[gegenerA][0][0]-x<<layer;
 				int yY = config.bots[gegenerA][0][1]-y<<layer;
 				delta = xX*xX+yY*yY;
@@ -184,7 +184,8 @@ public class StrategicMap {
 		if(layerN == 0){
 			for(int x = 0; x<size; x++){
 				for(int y = 0; y<size; y++){
-					config.layer[0][x+xOffset][y+yOffset] = client.getBoard(x+xOffset, y+yOffset);					
+				    	boolean isSlowPowerup = config.isWithinSlowPowerupArea(x+xOffset, y+yOffset);
+					config.layer[0][x+xOffset][y+yOffset] = isSlowPowerup ? 0 : client.getBoard(x+xOffset, y+yOffset);					
 				}	
 			}
 		} else {
@@ -215,7 +216,7 @@ public class StrategicMap {
 	}
 	
 	public void renderWalkMap(){
-		//update(xXx,yYy,warumGehtDieScheißeNichtHäääää);		
+		//update(xXx,yYy,warumGehtDieScheiï¿½eNichtHï¿½ï¿½ï¿½ï¿½ï¿½);		
 		int offsetX = 0;
 		int offsetY = 0;
 		int size = 1;
@@ -246,7 +247,7 @@ public class StrategicMap {
 	}
 	
 	public void renderDebugMap(){
-		//update(xXx,yYy,warumGehtDieScheißeNichtHäääää);		
+		//update(xXx,yYy,warumGehtDieScheiï¿½eNichtHï¿½ï¿½ï¿½ï¿½ï¿½);		
 		int offsetX = 0;
 		int offsetY = 0;
 		int size = 1;
