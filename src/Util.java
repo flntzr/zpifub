@@ -36,7 +36,7 @@ public class Util {
 	int xEnd = Util.clamp(x + 1, 0, boardSize - 1);
 	int yStart = Util.clamp(y - 1, 0, boardSize - 1);
 	int yEnd = Util.clamp(y + 1, 0, boardSize - 1);
-	int[] neighbours = new int[(xEnd - xStart + 1) * (yEnd - yStart + 1)];
+	int[] neighbours = new int[(xEnd - xStart + 1) * (yEnd - yStart + 1) - 1];
 	int i = 0;
 	for (int iY = yStart; iY <= yEnd; iY++) {
 	    for (int iX = xStart; iX <= xEnd; iX++) {
