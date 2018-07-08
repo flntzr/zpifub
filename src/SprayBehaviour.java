@@ -90,7 +90,6 @@ public class SprayBehaviour extends BotBehaviour {
 	    }
 	});
 
-	// TODO also take the distance into account to find the best target
 	int[] pickedScore = scores.get(0);
 	int[] position = new int[2];
 	int centerOffset = bot.aStarLayer == 0 ? 0 : 1 << (bot.aStarLayer - 1);

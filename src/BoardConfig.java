@@ -96,22 +96,22 @@ public class BoardConfig {
 	return this.getColor(layer, index) != 0;
     }
 
-    public int[] aStar(int x, int y, int destX, int destY, int layer) {
-	int layerSize = Util.BOARD_SIZE >> layer;
-	int start = (y >> layer) * (Util.BOARD_SIZE >> layer) + (x >> layer);
-	int dest = (destY >> layer) * (Util.BOARD_SIZE >> layer) + (destX >> layer);
-
-	List<Integer> path = aStar(start, dest, layer);
-	int[] result = new int[path.size() * 2];
-	for (int i = 0; i < result.length >> 1; i++) {
-	    int step = path.get(i);
-	    int stepLayerX = step % layerSize;
-	    int stepLayerY = step / layerSize;
-	    result[i * 2] = stepLayerX * 1 << layer;
-	    result[i * 2 + 1] = stepLayerY * 1 << layer;
-	}
-	return result;
-    }
+//    public int[] aStar(int x, int y, int destX, int destY, int layer) {
+//	int layerSize = Util.BOARD_SIZE >> layer;
+//	int start = (y >> layer) * (Util.BOARD_SIZE >> layer) + (x >> layer);
+//	int dest = (destY >> layer) * (Util.BOARD_SIZE >> layer) + (destX >> layer);
+//
+//	List<Integer> path = aStar(start, dest, layer);
+//	int[] result = new int[path.size() * 2];
+//	for (int i = 0; i < result.length >> 1; i++) {
+//	    int step = path.get(i);
+//	    int stepLayerX = step % layerSize;
+//	    int stepLayerY = step / layerSize;
+//	    result[i * 2] = stepLayerX * 1 << layer;
+//	    result[i * 2 + 1] = stepLayerY * 1 << layer;
+//	}
+//	return result;
+//    }
 
     /**
      * Accepts start and goal position in the context of the specified layer, e.g.
@@ -122,55 +122,55 @@ public class BoardConfig {
      * @param layerN
      * @return the positions specific to that layer.
      */
-    private List<Integer> aStar(int startIndex, int goalIndex, int layerN) {
-	int boardSize = Util.BOARD_SIZE >> layerN;
-	Set<Integer> closedSet = new HashSet<>();
-	Map<Integer, Integer> cameFrom = new HashMap<>(); // most efficient previous step
-	Map<Integer, Double> gScore = new HashMap<>(); // each node with cost it takes to reach from previous node
-	Map<Integer, Double> fScore = new HashMap<>(); // each node with cost it takes to reach from the start
-	List<Integer> openSet = new ArrayList<>();
-	openSet.add(startIndex);
-	for (int i = 0; i < (boardSize * boardSize); i++) {
-	    gScore.put(i, Double.MAX_VALUE);
-	    fScore.put(i, Double.MAX_VALUE);
-	}
-	gScore.put(startIndex, 0d); // cost to start = 0
-	fScore.put(startIndex, this.estimateCost(startIndex, goalIndex, layerN));
-	while (!openSet.isEmpty()) {
-	    int current = openSet.get(0); // openSet is sorted ascending by fScore -> always get lowest
-	    if (current == goalIndex) {
-		return reconstructPath(cameFrom, current);
-	    }
-	    openSet.remove(0);
-	    closedSet.add(current);
-
-	    for (int neighbor : this.getWalkableNeighbors(layerN, current, boardSize)) {
-		if (closedSet.contains(neighbor)) {
-		    continue;
-		}
-		if (!openSet.contains(neighbor)) {
-		    openSet.add(neighbor);
-		}
-		// distance from start to neighbor
-		double tentativeGScore = gScore.get(current) + this.estimateCost(current, neighbor, layerN);
-		if (tentativeGScore >= gScore.get(neighbor)) {
-		    continue; // This path isn't better
-		}
-		// This path is better -> record it
-		cameFrom.put(neighbor, current);
-		gScore.put(neighbor, tentativeGScore);
-		fScore.put(neighbor, gScore.get(neighbor) + this.estimateCost(neighbor, goalIndex, layerN));
-		openSet.sort(new Comparator<Integer>() {
-		    @Override
-		    public int compare(Integer o1, Integer o2) {
-			return fScore.getOrDefault(o1, Double.MAX_VALUE)
-				.compareTo(fScore.getOrDefault(o2, Double.MAX_VALUE));
-		    }
-		});
-	    }
-	}
-	return new ArrayList<>(); // goal is not reachable
-    }
+//    private List<Integer> aStar(int startIndex, int goalIndex, int layerN) {
+//	int boardSize = Util.BOARD_SIZE >> layerN;
+//	Set<Integer> closedSet = new HashSet<>();
+//	Map<Integer, Integer> cameFrom = new HashMap<>(); // most efficient previous step
+//	Map<Integer, Double> gScore = new HashMap<>(); // each node with cost it takes to reach from previous node
+//	Map<Integer, Double> fScore = new HashMap<>(); // each node with cost it takes to reach from the start
+//	List<Integer> openSet = new ArrayList<>();
+//	openSet.add(startIndex);
+//	for (int i = 0; i < (boardSize * boardSize); i++) {
+//	    gScore.put(i, Double.MAX_VALUE);
+//	    fScore.put(i, Double.MAX_VALUE);
+//	}
+//	gScore.put(startIndex, 0d); // cost to start = 0
+//	fScore.put(startIndex, this.estimateCost(startIndex, goalIndex, layerN));
+//	while (!openSet.isEmpty()) {
+//	    int current = openSet.get(0); // openSet is sorted ascending by fScore -> always get lowest
+//	    if (current == goalIndex) {
+//		return reconstructPath(cameFrom, current);
+//	    }
+//	    openSet.remove(0);
+//	    closedSet.add(current);
+//
+//	    for (int neighbor : this.getWalkableNeighbors(layerN, current, boardSize)) {
+//		if (closedSet.contains(neighbor)) {
+//		    continue;
+//		}
+//		if (!openSet.contains(neighbor)) {
+//		    openSet.add(neighbor);
+//		}
+//		// distance from start to neighbor
+//		double tentativeGScore = gScore.get(current) + this.estimateCost(current, neighbor, layerN);
+//		if (tentativeGScore >= gScore.get(neighbor)) {
+//		    continue; // This path isn't better
+//		}
+//		// This path is better -> record it
+//		cameFrom.put(neighbor, current);
+//		gScore.put(neighbor, tentativeGScore);
+//		fScore.put(neighbor, gScore.get(neighbor) + this.estimateCost(neighbor, goalIndex, layerN));
+//		openSet.sort(new Comparator<Integer>() {
+//		    @Override
+//		    public int compare(Integer o1, Integer o2) {
+//			return fScore.getOrDefault(o1, Double.MAX_VALUE)
+//				.compareTo(fScore.getOrDefault(o2, Double.MAX_VALUE));
+//		    }
+//		});
+//	    }
+//	}
+//	return new ArrayList<>(); // goal is not reachable
+//    }
 
     private double estimateCost(int start, int goal, int layer) {
 	int boardSize = Util.BOARD_SIZE >> layer;
@@ -180,15 +180,15 @@ public class BoardConfig {
 	return Math.sqrt(distanceX * distanceX + distanceY * distanceY); // euclidean distance
     }
 
-    private List<Integer> reconstructPath(Map<Integer, Integer> cameFrom, int current) {
-	List<Integer> path = new ArrayList<>();
-	while (cameFrom.containsKey(current)) {
-	    current = cameFrom.get(current);
-	    path.add(current);
-	}
-	Collections.reverse(path);
-	return path;
-    }
+//    private List<Integer> reconstructPath(Map<Integer, Integer> cameFrom, int current) {
+//	List<Integer> path = new ArrayList<>();
+//	while (cameFrom.containsKey(current)) {
+//	    current = cameFrom.get(current);
+//	    path.add(current);
+//	}
+//	Collections.reverse(path);
+//	return path;
+//    }
 
     private int[] getWalkableNeighbors(int layer, int index, int boardSize) {
 	int[] tempNeighbors = Util.getNeighbors(index, boardSize);
