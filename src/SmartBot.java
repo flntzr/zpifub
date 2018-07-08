@@ -41,14 +41,15 @@ public class SmartBot implements Runnable {
 	map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
 
 	map.renderWalkMap();
-	//Thread heatmapUpdateThread = new Thread(new ScoreHeatmapUpdateThread(this.playerNumber, this.boardConfig));
-	//heatmapUpdateThread.start();
+	// Thread heatmapUpdateThread = new Thread(new
+	// ScoreHeatmapUpdateThread(this.playerNumber, this.boardConfig));
+	// heatmapUpdateThread.start();
 
 	Thread mapUpdateThread = new Thread(new MapUpdateThread(this.playerNumber, this.boardConfig, map));
 	mapUpdateThread.start();
 
-	this.boardConfig.botInstances.add(new BrushThread(this.boardConfig, this.playerNumber));
-	this.boardConfig.botInstances.add(new BasicBot(playerNumber, this.boardConfig,1, new PencilBehaviour()));
+	this.boardConfig.botInstances.add(new BasicBot(playerNumber, this.boardConfig, 0, new SprayBehaviour()));
+	this.boardConfig.botInstances.add(new BasicBot(playerNumber, this.boardConfig, 1, new PencilBehaviour()));
 	this.boardConfig.botInstances.add(new WidePencilBot());
 	for (int i = 0; i < 3; i++) {
 	    this.boardConfig.botThreads.add(new Thread(this.boardConfig.botInstances.get(i)));
@@ -71,13 +72,12 @@ public class SmartBot implements Runnable {
 		this.boardConfig.moveBot(update.player, update.bot, update.x, update.y);
 	    } else if (update.player == -1) {
 		// update spawned, type, position
-		 System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", "
-		 + update.y);
+		System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", " + update.y);
 		PowerupThread powerupThread = new PowerupThread(this.boardConfig, update.x, update.y, update.type,
 			this.playerNumber);
 		new Thread(powerupThread).start();
 	    } else {
-		 System.out.println("Collected powerup!");
+		System.out.println("Collected powerup!");
 		this.boardConfig.removeSlowPowerup(update.type, update.x, update.y);
 	    }
 	    for (int i = 0; i < this.boardConfig.bots[this.playerNumber].length; i++) {
