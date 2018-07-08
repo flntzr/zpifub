@@ -23,6 +23,8 @@ public class BoardConfig {
     public final int[] influenceRadii;
     public List<BotInterface> botInstances;
     public List<Thread> botThreads;
+    /** [startX, startY, endX, endY] */
+    public int[] slowdownArea = {-1,-1,-1,-1};
 
     public BoardConfig(int[] influenceRadii) {
 	this.bots = new int[3][3][2]; // 3 players, 3 bots, 2 coordinates
@@ -34,6 +36,17 @@ public class BoardConfig {
     public void moveBot(int playerID, int botID, int x, int y) {
 	this.bots[playerID][botID][0] = x;
 	this.bots[playerID][botID][1] = y;
+    }
+    
+    public void setSlowPowerupArea(int startX, int startY, int endX, int endY) {
+	this.slowdownArea[0] = startX;
+	this.slowdownArea[1] = startY;
+	this.slowdownArea[2] = endX;
+	this.slowdownArea[3] = endY;
+    }
+    
+    public boolean isWithinSlowPowerupArea(int x, int y) {
+	return x >= slowdownArea[0] && y >= slowdownArea[1] && x <= slowdownArea[2] && y <= slowdownArea[3];
     }
 
     public int getColor(int layer, int x, int y) {

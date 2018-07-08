@@ -37,7 +37,7 @@ public class SmartBot implements Runnable {
 	}
 
 	map.initWalkMap();
-	map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
+	map.pullCompleteMap();
 	map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
 	Thread heatmapUpdateThread = new Thread(new ScoreHeatmapUpdateThread(this.playerNumber, this.boardConfig));
 	heatmapUpdateThread.start();
@@ -53,9 +53,8 @@ public class SmartBot implements Runnable {
 		map.pullChunk();
 //	    map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
 		map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
-	    // TODO only update direction if it has changed
 
-	    // map.render();
+//	     map.render();
 	    if ((update = client.pullNextUpdate()) == null) {
 		try {
 		    Thread.sleep(20);
@@ -71,8 +70,8 @@ public class SmartBot implements Runnable {
 		this.boardConfig.moveBot(update.player, update.bot, update.x, update.y);
 	    } else if (update.player == -1) {
 		// update spawned, type, position
-		// System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", "
-		// + update.y);
+		 System.out.println(this.playerNumber + ": " + "Powerup at " + update.x + ", "
+		 + update.y);
 		PowerupThread powerupThread = new PowerupThread(this.boardConfig, update.x, update.y, update.type,
 			this.playerNumber);
 		new Thread(powerupThread).start();
@@ -90,10 +89,10 @@ public class SmartBot implements Runnable {
 
 
 	    for (int i  = 0; i < 3; i++) {
+
 			BotInterface bot= this.boardConfig.botInstances.get(i);
 			int[] direction = bot.getMoveDirection();
 			client.setMoveDirection(i, direction[0], direction[1]);
-
 	    }
 	    map.render();
 	}

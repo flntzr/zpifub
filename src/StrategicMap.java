@@ -55,7 +55,9 @@ public class StrategicMap {
 		
 	}
 	
-
+	public void pullCompleteMap(){
+		refreshLayer(0,Util.BOARD_SIZE,0,0);
+	}
 	
 	public void update(int x,int y ,int minSize){
 		update2(x,y,0,0,1024,9,minSize);
