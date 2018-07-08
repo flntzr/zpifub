@@ -39,8 +39,8 @@ public class SmartBot implements Runnable {
 	map.initWalkMap();
 	map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
 	map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
-	Thread heatmapUpdateThread = new Thread(new ScoreHeatmapUpdateThread(this.playerNumber, this.boardConfig));
-	heatmapUpdateThread.start();
+	Thread mapUpdateThread = new Thread(new MapUpdateThread(this.playerNumber, this.boardConfig, map));
+	mapUpdateThread.start();
 	this.boardConfig.botInstances.add(new BrushThread(this.boardConfig, this.playerNumber));
 	this.boardConfig.botInstances.add(new PencilBot(playerNumber, this.boardConfig,1));
 	this.boardConfig.botInstances.add(new WidePencilBot());
@@ -50,8 +50,8 @@ public class SmartBot implements Runnable {
 	}
 
 	while (true) {
-	    map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
-		map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
+//	    map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
+//		map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
 
 //	     map.render();
 	    if ((update = client.pullNextUpdate()) == null) {

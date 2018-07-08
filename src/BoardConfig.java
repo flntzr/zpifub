@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class BoardConfig {
     public List<BotInterface> botInstances;
     public List<Thread> botThreads;
     /** [startX, startY, endX, endY] */
-    public int[] slowdownArea = {-1,-1,-1,-1};
+    public int[][] slowdownAreas = {};
 
     public BoardConfig(int[] influenceRadii) {
 	this.bots = new int[3][3][2]; // 3 players, 3 bots, 2 coordinates
@@ -37,16 +38,25 @@ public class BoardConfig {
 	this.bots[playerID][botID][0] = x;
 	this.bots[playerID][botID][1] = y;
     }
-    
-    public void setSlowPowerupArea(int startX, int startY, int endX, int endY) {
-	this.slowdownArea[0] = startX;
-	this.slowdownArea[1] = startY;
-	this.slowdownArea[2] = endX;
-	this.slowdownArea[3] = endY;
+
+    public void addSlowPowerupArea(int startX, int startY, int endX, int endY) {
+	int[][] newAreas = new int[this.slowdownAreas.length + 1][4];
+	System.arraycopy(slowdownAreas, 0, newAreas, 0, this.slowdownAreas.length);
+	int index = this.slowdownAreas.length;
+	newAreas[index][0] = startX;
+	newAreas[index][1] = startY;
+	newAreas[index][2] = endX;
+	newAreas[index][3] = endY;
+	this.slowdownAreas = newAreas;
     }
-    
+
     public boolean isWithinSlowPowerupArea(int x, int y) {
-	return x >= slowdownArea[0] && y >= slowdownArea[1] && x <= slowdownArea[2] && y <= slowdownArea[3];
+	for (int[] slowdownArea: this.slowdownAreas) {
+	    if (x >= slowdownArea[0] && y >= slowdownArea[1] && x <= slowdownArea[2] && y <= slowdownArea[3]) {
+		return true;
+	    }
+	}
+	return false;	
     }
 
     public int getColor(int layer, int x, int y) {
@@ -67,20 +77,20 @@ public class BoardConfig {
     }
 
     public int[] aStar(int x, int y, int destX, int destY, int layer) {
-		int layerSize = Util.BOARD_SIZE >> layer;
-		int start = (y >> layer) * (Util.BOARD_SIZE >> layer) + (x >> layer);
-		int dest = (destY >> layer) * (Util.BOARD_SIZE >> layer) + (destX >> layer);
-		
-		List<Integer> path = aStar(start, dest, layer);
-		int[] result = new int[path.size()*2];
-		for (int i = 0; i < result.length>>1; i++) {
-		    int step = path.get(i);
-		    int stepLayerX = step % layerSize;
-		    int stepLayerY = step / layerSize;
-		    result[i*2] = stepLayerX * 1<<layer;
-		    result[i*2+1] = stepLayerY * 1<<layer;
-		}
-		return result;
+	int layerSize = Util.BOARD_SIZE >> layer;
+	int start = (y >> layer) * (Util.BOARD_SIZE >> layer) + (x >> layer);
+	int dest = (destY >> layer) * (Util.BOARD_SIZE >> layer) + (destX >> layer);
+
+	List<Integer> path = aStar(start, dest, layer);
+	int[] result = new int[path.size() * 2];
+	for (int i = 0; i < result.length >> 1; i++) {
+	    int step = path.get(i);
+	    int stepLayerX = step % layerSize;
+	    int stepLayerY = step / layerSize;
+	    result[i * 2] = stepLayerX * 1 << layer;
+	    result[i * 2 + 1] = stepLayerY * 1 << layer;
+	}
+	return result;
     }
 
     /**
