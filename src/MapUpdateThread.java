@@ -16,7 +16,7 @@ public class MapUpdateThread implements Runnable {
     public void run() {
 	int runtime = 0;
 	while (runtime < gameRuntime + 10) {
-	    map.add(1, 1, 1024);
+	    map.pullCompleteMap();
 	    map.update(1, 1, 1024);
 	    this.refreshScoreLayers();
 	    map.render();

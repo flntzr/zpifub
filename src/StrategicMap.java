@@ -30,9 +30,34 @@ public class StrategicMap {
 	
 
 	//int[][][] layer;
+
+	int x = 0;
+	int y = 0;
+	int chunkSize = 0;
+	public void pullChunk(){
+		pullChunkFromServer(x,y,chunkSize);
+		x+=chunkSize;
+		if(x>=Util.BOARD_SIZE){
+			x= 0;
+			y+=chunkSize;
+			if(y>=Util.BOARD_SIZE) y= 0;
+		}
+	}
 	
-	public void add(int x,int y ,int minSize){
-		refreshLayer(0,minSize,(x/minSize)*minSize,(y/minSize)*minSize);
+	public void pullChunkFromServer(int startX, int startY, int size) {
+		int endX = startX + size;
+		int endY = startY + size;
+		for(int x = startX; x<endX; x++){
+			for(int y = startY; y<endY; y++){
+			    	boolean isWithinSlowDownArea = config.isWithinSlowPowerupArea(x ,y);
+				config.layer[0][x][y] = isWithinSlowDownArea ? 0 : client.getBoard(x, y);					
+			}	
+		}
+		
+	}
+	
+	public void pullCompleteMap(){
+		refreshLayer(0,Util.BOARD_SIZE,0,0);
 	}
 	
 	public void update(int x,int y ,int minSize){
@@ -128,14 +153,13 @@ public class StrategicMap {
 				delta = xX*xX+yY*yY;
 				if(delta<0) delta = -delta;
 
-				//delta = config.bots[gegenerA][0][0]*config.bots[gegenerA][0][0] + config.bots[gegenerA][0][1]*config.bots[gegenerA][0][1];
+
 				if(dist<delta){
 					dist = delta;
 					bestX = x;
 					bestY = y;					
 				}
-//				config.debuglayer[layer][x][y] = (int)(((delta/1.41421f)+0.5f)*255.0f);
-				//if(delta<0.5f) config.debuglayer[layer][x][y] = config.debuglayer[layer][x][y]<<8;
+
 			}
 		}
 
@@ -184,8 +208,8 @@ public class StrategicMap {
 		if(layerN == 0){
 			for(int x = 0; x<size; x++){
 				for(int y = 0; y<size; y++){
-				    	boolean isSlowPowerup = config.isWithinSlowPowerupArea(x+xOffset, y+yOffset);
-					config.layer[0][x+xOffset][y+yOffset] = isSlowPowerup ? 0 : client.getBoard(x+xOffset, y+yOffset);					
+				    	boolean isWithinSlowDownArea = config.isWithinSlowPowerupArea(x + xOffset,y + yOffset);
+					config.layer[0][x+xOffset][y+yOffset] = isWithinSlowDownArea ? 0 : client.getBoard(x+xOffset, y+yOffset);					
 				}	
 			}
 		} else {
@@ -284,9 +308,9 @@ public class StrategicMap {
 		int offsetIncrease = 1024;		
 		for(int l = 0; l < 10; l++) {
 			if(l<5) {
-				for(int y = 0; y < config.scoreHeatmap[l].length; y+=size){
-					for(int x = 0; x < config.scoreHeatmap[l].length; x += size){			
-						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, config.scoreHeatmap[l][x][y]);
+				for(int y = 0; y < config.layer[l].length; y+=size){
+					for(int x = 0; x < config.layer[l].length; x += size){			
+						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, config.layer[l][x][y]);
 					}
 				}
 				//size = size << 1;
@@ -297,9 +321,9 @@ public class StrategicMap {
 				offsetX = 1600;
 				if(l==5 )offsetY = 0;
 				else offsetY = (l-4)*140+50;
-				for(int y = 0; y < config.scoreHeatmap[l].length*8; y++){
-					for(int x = 0; x < config.scoreHeatmap[l].length*8; x ++){			
-						mapframe.setPixel((x) + offsetX, (y) + offsetY, config.scoreHeatmap[l][x/8][y/8]);
+				for(int y = 0; y < config.layer[l].length*8; y++){
+					for(int x = 0; x < config.layer[l].length*8; x ++){			
+						mapframe.setPixel((x) + offsetX, (y) + offsetY, config.layer[l][x/8][y/8]);
 					}
 				}
 			}

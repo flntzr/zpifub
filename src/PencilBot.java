@@ -56,12 +56,12 @@ public class PencilBot implements Runnable, BotInterface{
 	int[][] pathCoords;
 	
 	private void walkPath(){
-		int id = pathIndex;
-		if(walkToDestination(pathCoords[id][0]*(1<<aStarLayer),pathCoords[id][1]*(1<<aStarLayer),32)){
+		if(walkToDestination(pathCoords[pathIndex][0]*(1<<aStarLayer),pathCoords[pathIndex][1]*(1<<aStarLayer),16)){
 			pathIndex++;
 			System.out.println("next Step");
 		}
 		
+		//System.out.println(pathIndex+":"+pathCoords.length);
 		if(pathIndex>=pathCoords.length){
 			searching = true;			
 		}
@@ -157,6 +157,7 @@ public class PencilBot implements Runnable, BotInterface{
 		public void run() {
 			while(true) {
 				if(searching) {
+					System.out.println("Suche neues Ziel...");
 					searchDestination();
 					pathCoords = getPathToDestination();
 					pathIndex = 0;
@@ -169,13 +170,15 @@ public class PencilBot implements Runnable, BotInterface{
 		}
 		
 		private void searchDestination() {
-			int layer = 0;
+
 			do {
 				//Erstmal nur Random ein begehbares Ziel suchen
 				//TODO: Hier mit Bewertungsfunktion suchen
-				destination[0] = random.nextInt(board.layer[layer].length);
-				destination[1] = random.nextInt(board.layer[layer].length);
-			} while(board.layer[layer][destination[0]][destination[1]]==0);
+				destination[0] = random.nextInt(board.layer[aStarLayer].length);
+				destination[1] = random.nextInt(board.layer[aStarLayer].length);
+			} while(board.walklayer[aStarLayer][destination[0]][destination[1]]==0);
+			destination[0] *= (1<<aStarLayer);
+			destination[1] *= (1<<aStarLayer);
 
 		}
 		
@@ -189,9 +192,9 @@ public class PencilBot implements Runnable, BotInterface{
 			destNew[0] /=(1<<aStarLayer); 
 			destNew[1] /=(1<<aStarLayer);
 			int[][] coords = AStar.AStar(startNew,destNew,board.layer[aStarLayer],board.layer[aStarLayer].length);
-//			for(int i = 0; i< coords.length; i++){
-//				System.out.println(Arrays.toString(coords[i]));
-//			}
+			for(int i = 0; i< coords.length; i++){
+				System.out.println(Arrays.toString(coords[i]));
+			}
 			return coords;
 			
 		}
