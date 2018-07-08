@@ -308,9 +308,9 @@ public class StrategicMap {
 		int offsetIncrease = 1024;		
 		for(int l = 0; l < 10; l++) {
 			if(l<5) {
-				for(int y = 0; y < config.layer[l].length; y+=size){
-					for(int x = 0; x < config.layer[l].length; x += size){			
-						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, config.layer[l][x][y]);
+				for(int y = 0; y < config.scoreHeatmap[l].length; y+=size){
+					for(int x = 0; x < config.scoreHeatmap[l].length; x += size){			
+						mapframe.setPixel((x/size) + offsetX, (y/size) + offsetY, config.scoreHeatmap[l][x][y]);
 					}
 				}
 				//size = size << 1;
@@ -321,9 +321,9 @@ public class StrategicMap {
 				offsetX = 1600;
 				if(l==5 )offsetY = 0;
 				else offsetY = (l-4)*140+50;
-				for(int y = 0; y < config.layer[l].length*8; y++){
-					for(int x = 0; x < config.layer[l].length*8; x ++){			
-						mapframe.setPixel((x) + offsetX, (y) + offsetY, config.layer[l][x/8][y/8]);
+				for(int y = 0; y < config.scoreHeatmap[l].length*8; y++){
+					for(int x = 0; x < config.scoreHeatmap[l].length*8; x ++){			
+						mapframe.setPixel((x) + offsetX, (y) + offsetY, config.scoreHeatmap[l][x/8][y/8]);
 					}
 				}
 			}
