@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lenz.htw.zpifub.PowerupType;
+
 public class BoardConfig {
 
     public int[][][] walklayer;
@@ -39,24 +41,43 @@ public class BoardConfig {
 	this.bots[playerID][botID][1] = y;
     }
 
-    public void addSlowPowerupArea(int startX, int startY, int endX, int endY) {
-	int[][] newAreas = new int[this.slowdownAreas.length + 1][4];
-	System.arraycopy(slowdownAreas, 0, newAreas, 0, this.slowdownAreas.length);
+    public void addSlowPowerup(int x, int y) {
+	// powerups can be collected in a 20px radius. For good measure make it 30px.
+	int powerupRadius = 30;
+	int[][] newAreas = new int[this.slowdownAreas.length + 1][6];
+	System.arraycopy(this.slowdownAreas, 0, newAreas, 0, this.slowdownAreas.length);
 	int index = this.slowdownAreas.length;
-	newAreas[index][0] = startX;
-	newAreas[index][1] = startY;
-	newAreas[index][2] = endX;
-	newAreas[index][3] = endY;
+	newAreas[index][0] = x;
+	newAreas[index][1] = y;
+	newAreas[index][2] = x - powerupRadius;
+	newAreas[index][3] = y - powerupRadius;
+	newAreas[index][4] = x + powerupRadius;
+	newAreas[index][5] = y + powerupRadius;
+	this.slowdownAreas = newAreas;
+    }
+
+    public void removeSlowPowerup(PowerupType type, int x, int y) {
+	if (!type.name().equals("SLOW")) {
+	    return;
+	}
+	int[][] newAreas = new int[this.slowdownAreas.length - 1][6];
+	int newAreasIndex = 0;
+	for (int i = 0; i < this.slowdownAreas.length; i++) {
+	    if (x != this.slowdownAreas[i][0] || y != this.slowdownAreas[i][1]) {
+		newAreas[newAreasIndex] = this.slowdownAreas[i];
+		newAreasIndex++;
+	    }
+	}
 	this.slowdownAreas = newAreas;
     }
 
     public boolean isWithinSlowPowerupArea(int x, int y) {
-	for (int[] slowdownArea: this.slowdownAreas) {
-	    if (x >= slowdownArea[0] && y >= slowdownArea[1] && x <= slowdownArea[2] && y <= slowdownArea[3]) {
+	for (int[] slowdownArea : this.slowdownAreas) {
+	    if (x >= slowdownArea[2] && y >= slowdownArea[3] && x <= slowdownArea[4] && y <= slowdownArea[5]) {
 		return true;
 	    }
 	}
-	return false;	
+	return false;
     }
 
     public int getColor(int layer, int x, int y) {

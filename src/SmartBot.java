@@ -50,10 +50,6 @@ public class SmartBot implements Runnable {
 	}
 
 	while (true) {
-//	    map.pullChunk();
-//	    map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
-//	    map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
-//	    map.render();
 	    if ((update = client.pullNextUpdate()) == null) {
 		try {
 		    Thread.sleep(20);
@@ -75,8 +71,8 @@ public class SmartBot implements Runnable {
 			this.playerNumber);
 		new Thread(powerupThread).start();
 	    } else {
-		// update collected
-		// System.out.println("update!");
+		 System.out.println("Collected powerup!");
+		this.boardConfig.removeSlowPowerup(update.type, update.x, update.y);
 	    }
 	    for (int i = 0; i < this.boardConfig.bots[this.playerNumber].length; i++) {
 		int[] bot = this.boardConfig.bots[this.playerNumber][i];
@@ -85,15 +81,11 @@ public class SmartBot implements Runnable {
 		    continue;
 		}
 	    }
-
-
-	    for (int i  = 0; i < 3; i++) {
-
-			BotInterface bot= this.boardConfig.botInstances.get(i);
-			int[] direction = bot.getMoveDirection();
-			client.setMoveDirection(i, direction[0], direction[1]);
+	    for (int i = 0; i < 3; i++) {
+		BotInterface bot = this.boardConfig.botInstances.get(i);
+		int[] direction = bot.getMoveDirection();
+		client.setMoveDirection(i, direction[0], direction[1]);
 	    }
-//	    map.render();
 	}
     }
 }
