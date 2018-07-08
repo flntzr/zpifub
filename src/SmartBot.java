@@ -42,7 +42,7 @@ public class SmartBot implements Runnable {
 	Thread heatmapUpdateThread = new Thread(new ScoreHeatmapUpdateThread(this.playerNumber, this.boardConfig));
 	heatmapUpdateThread.start();
 	this.boardConfig.botInstances.add(new BrushThread(this.boardConfig, this.playerNumber));
-	this.boardConfig.botInstances.add(new PencilBot(playerNumber, this.boardConfig));
+	this.boardConfig.botInstances.add(new PencilBot(playerNumber, this.boardConfig,1));
 	this.boardConfig.botInstances.add(new WidePencilBot());
 	for (int i = 0; i < 3; i++) {
 	    this.boardConfig.botThreads.add(new Thread(this.boardConfig.botInstances.get(i)));
@@ -50,8 +50,8 @@ public class SmartBot implements Runnable {
 	}
 
 	while (true) {
-	    map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
-	    map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
+	    //map.add(this.boardConfig.bots[2][1][0], this.boardConfig.bots[2][1][1], 1024);
+		//map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
 	    // TODO only update direction if it has changed
 
 	    // map.render();
@@ -88,8 +88,9 @@ public class SmartBot implements Runnable {
 	    }
 
 	    for (BotInterface bot : this.boardConfig.botInstances) {
-		int[] direction = bot.getMoveDirection();
-		client.setMoveDirection(1, direction[0], direction[1]);
+			int[] direction = bot.getMoveDirection();
+			System.out.println((direction[0])+"+"+(direction[1]));
+			client.setMoveDirection(bot.botId, direction[0], direction[1]);
 	    }
 	}
     }
