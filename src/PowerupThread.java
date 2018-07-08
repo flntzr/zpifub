@@ -60,6 +60,9 @@ public class PowerupThread implements Runnable {
 	    }
 	});
 	for (Map.Entry<Integer, Float> entry : sortedTravelTimesMap) {
+	    if (paths[entry.getKey()].length == 0) {
+		continue;
+	    }
 	    BotInterface bot = this.boardConfig.botInstances.get(entry.getKey());
 	    boolean accept = bot.collectPowerUp(paths[entry.getKey()]);
 	    if (accept) {

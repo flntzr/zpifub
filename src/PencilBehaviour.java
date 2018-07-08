@@ -17,21 +17,19 @@ class PencilBehaviour extends BotBehaviour{
 			gegnerId = (bot.playerNumber + (bot.random.nextInt(1)+1))%3;
 			botId =	bot.random.nextInt(3);
 //			System.out.println(this.bot.playerNumber);
-			System.out.println(gegnerId);
-			System.out.println(botId);
+//			System.out.println(gegnerId);
+//			System.out.println(botId);
 
 			while(true) {
 				if(bot.searching) {
 //					System.out.println("Suche neues Ziel...");
 					searchDestination();
-
 					bot.pathCoords = getPathToDestination();
-
 					bot.pathIndex = 0;
 					bot.searching = false;
 					//System.out.println(bot.searching || bot.pathCoords.length == 0);
 				} else{
-					//System.out.println("Test");
+				    	bot.busyCollectingPowerup = false;
 					restartSearchIfNoMoveHappendInMilliseconds(1000);
 				}
 

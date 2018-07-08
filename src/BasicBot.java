@@ -11,11 +11,11 @@ public class BasicBot implements Runnable, BotInterface {
     public int[] destination = new int[] { 0, 0 };
     public int aStarLayer = 4;
     public int pointReachRange = 20; // Reichweite ab wann ein Punkt erreicht wurde
-    public boolean searching = true;
+    public boolean searching = false;
     public int pathIndex;
     public int[][] pathCoords;
     public BotBehaviour botBehaviour;
-    public boolean isGoingForPowerup = false;
+    public boolean busyCollectingPowerup = false;
 
     public BasicBot(int playerNumber, BoardConfig board, int botId, BotBehaviour botBehaviour) {
 	this.playerNumber = playerNumber;
@@ -44,8 +44,10 @@ public class BasicBot implements Runnable, BotInterface {
 		if (pathCoords == null || this.pathCoords.length == 0)
 		    searching = true;
 		idleMove(); // Idle wenn kein Ziel gefunden
-	    } else {
-		walkPath(); // Erstmal direkt aufs Ziel gehen
+	    } else { 
+		if (this.pathCoords != null || this.pathCoords.length > 0) {
+		    walkPath(); // Erstmal direkt aufs Ziel gehen		    
+		}
 		// TODO: N�chster Schritt,Hier A* Einbinden und testen
 	    }
 
@@ -58,7 +60,6 @@ public class BasicBot implements Runnable, BotInterface {
     }
 
     private void walkPath() {
-
 	if (walkToDestination(pathCoords[pathIndex][0] * (1 << aStarLayer),
 		pathCoords[pathIndex][1] * (1 << aStarLayer), pointReachRange)) {
 	    pathIndex++;
@@ -94,12 +95,12 @@ public class BasicBot implements Runnable, BotInterface {
 
     @Override
     public final boolean collectPowerUp(int[][] path) {
-	if (isGoingForPowerup) {
+	if (busyCollectingPowerup) {
 	    // the bot if already going for another powerup
 	    return false;
 	}
-	System.out.println("Bot " + this.playerNumber + " is going for the powerup.");
-	this.isGoingForPowerup = true;
+	System.out.println("Bot " + this.botId + " is going for the powerup.");
+	this.busyCollectingPowerup = true;
 	pathIndex = 0;
 	this.pathCoords = path; 
 	searching = false;

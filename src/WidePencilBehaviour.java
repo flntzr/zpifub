@@ -23,6 +23,7 @@ public class WidePencilBehaviour extends BotBehaviour{
 				bot.pathIndex = 0;
 				bot.searching = false;
 			    } else {
+				bot.busyCollectingPowerup = false;
 				restartSearchIfNoMoveHappendInMilliseconds(1000);
 			    }
 		
