@@ -75,7 +75,7 @@ public class WidePencilBehaviour extends BotBehaviour{
 			int radius = 5;
 			for(int x = -radius + pX; x < radius + pX; x++){
 				for(int y = -radius + py; y < radius + py; y++) {
-			    	System.out.println(x);
+//			    	System.out.println(x);
 					if(x<0||x>=bot.board.layer[bot.aStarLayer].length || y<0||y>=bot.board.layer[bot.aStarLayer].length ) continue;
 					if(bot.board.walklayer[bot.aStarLayer][x][y] == 0) continue;
 
@@ -92,7 +92,7 @@ public class WidePencilBehaviour extends BotBehaviour{
 					}
 					
 					else if(bot.playerNumber == 1){
-						//System.out.println("Ich bin Grün");
+						//System.out.println("Ich bin Grï¿½n");
 						if(g<=r || g<=b){
 							return new int[]{x*(1<<bot.aStarLayer),y*(1<<bot.aStarLayer)};
 						}

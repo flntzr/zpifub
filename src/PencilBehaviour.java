@@ -16,13 +16,13 @@ class PencilBehaviour extends BotBehaviour{
 		public void run() {
 			gegnerId = (bot.playerNumber + (bot.random.nextInt(1)+1))%3;
 			botId =	bot.random.nextInt(3);
-			System.out.println(this.bot.playerNumber);
+//			System.out.println(this.bot.playerNumber);
 			System.out.println(gegnerId);
 			System.out.println(botId);
 
 			while(true) {
 				if(bot.searching) {
-					System.out.println("Suche neues Ziel...");
+//					System.out.println("Suche neues Ziel...");
 					searchDestination();
 
 					bot.pathCoords = getPathToDestination();
@@ -54,11 +54,11 @@ class PencilBehaviour extends BotBehaviour{
 			destNew[0] /=(1<<bot.aStarLayer); 
 			destNew[1] /=(1<<bot.aStarLayer);
 			int[][] coords = AStar.search(startNew,destNew,bot.board.walklayer[bot.aStarLayer],bot.board.walklayer[bot.aStarLayer].length, bot.board.scoreHeatmap[bot.aStarLayer]);
-			System.out.println("Start"+Arrays.toString(startNew));
-			System.out.println("Ende"+Arrays.toString(destNew));
-			for(int i = 0; i<coords.length; i++){
-				System.out.println(Arrays.toString(coords[i]));
-			}
+//			System.out.println("Start"+Arrays.toString(startNew));
+//			System.out.println("Ende"+Arrays.toString(destNew));
+//			for(int i = 0; i<coords.length; i++){
+//				System.out.println(Arrays.toString(coords[i]));
+//			}
 			return coords;
 			
 		}

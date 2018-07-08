@@ -10,12 +10,12 @@ public class BasicBot implements Runnable, BotInterface {
     public Thread searchThread;
     public int[] destination = new int[] { 0, 0 };
     public int aStarLayer = 4;
-    public int pointReachRange = 25; // Reichweite ab wann ein Punkt erreicht wurde
+    public int pointReachRange = 20; // Reichweite ab wann ein Punkt erreicht wurde
     public boolean searching = true;
     public int pathIndex;
     public int[][] pathCoords;
     public BotBehaviour botBehaviour;
-    public boolean collectPowerup = false;
+    public boolean isGoingForPowerup = false;
 
     public BasicBot(int playerNumber, BoardConfig board, int botId, BotBehaviour botBehaviour) {
 	this.playerNumber = playerNumber;
@@ -93,10 +93,17 @@ public class BasicBot implements Runnable, BotInterface {
     }
 
     @Override
-    public void collectPowerUp(int[][] path) {
+    public final boolean collectPowerUp(int[][] path) {
+	if (isGoingForPowerup) {
+	    // the bot if already going for another powerup
+	    return false;
+	}
+	System.out.println("Bot " + this.playerNumber + " is going for the powerup.");
+	this.isGoingForPowerup = true;
 	pathIndex = 0;
-	this.pathCoords = path;
+	this.pathCoords = path; 
 	searching = false;
+	return true;
     }
 
 }

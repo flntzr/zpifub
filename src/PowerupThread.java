@@ -1,3 +1,14 @@
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 import lenz.htw.zpifub.PowerupType;
 
 public class PowerupThread implements Runnable {
@@ -22,16 +33,10 @@ public class PowerupThread implements Runnable {
 	    this.boardConfig.addSlowPowerup(x, y);
 	    return;
 	}
-	int[][][][] paths = new int[3][3][][];
-	int fastestPlayer = 0;
-	int fastestBot = 0;
-	float fastestTravelTime = Integer.MAX_VALUE;
-	// for (int playerIndex = 0; playerIndex < 3; playerIndex++) {
+	int[][][] paths = new int[3][][];
 	int playerIndex = this.playerID;
+	List<Map.Entry<Integer, Float>> sortedTravelTimesMap = new ArrayList<Map.Entry<Integer, Float>>();
 	for (int botIndex = 0; botIndex < 3; botIndex++) {
-	    // int x = this.boardConfig.bots[playerIndex][botIndex][0];
-	    // int y = this.boardConfig.bots[playerIndex][botIndex][1];
-	    // int[] dest = new int[] { x, y };
 	    int[] startNew = new int[] { this.boardConfig.bots[playerIndex][botIndex][0],
 		    this.boardConfig.bots[playerIndex][botIndex][1] };
 	    startNew[0] = startNew[0] / (1 << A_STAR_LAYER);
@@ -41,25 +46,27 @@ public class PowerupThread implements Runnable {
 	    destNew[0] /= (1 << A_STAR_LAYER);
 	    destNew[1] /= (1 << A_STAR_LAYER);
 
-	    int[][] coords = AStar.search(startNew, destNew, this.boardConfig.layer[A_STAR_LAYER],
-		    Util.BOARD_SIZE >> 4, null);
+	    int[][] coords = AStar.search(startNew, destNew, this.boardConfig.layer[A_STAR_LAYER], Util.BOARD_SIZE >> 4,
+		    null);
 
-	    // int[][] coords = AStar.search(this.boardConfig.bots[playerIndex][botIndex],
-	    // destNew, this.boardConfig.layer[4],
-	    // Util.BOARD_SIZE >> 4, null);
-	    paths[playerIndex][botIndex] = coords;
-	    float travelTime = Util.BOT_SPEEDS[botIndex] * paths[playerIndex][botIndex].length;
-	    if (travelTime < fastestTravelTime) {
-		fastestPlayer = playerIndex;
-		fastestBot = botIndex;
-		fastestTravelTime = travelTime;
+	    paths[botIndex] = coords;
+	    float travelTime = Util.BOT_SPEEDS[botIndex] * paths[botIndex].length;
+	    sortedTravelTimesMap.add(new AbstractMap.SimpleEntry<Integer, Float>(botIndex, travelTime));
+	}
+	Collections.sort(sortedTravelTimesMap, new Comparator<Map.Entry<Integer, Float>>() {
+	    @Override
+	    public int compare(Entry<Integer, Float> o1, Entry<Integer, Float> o2) {
+		return o1.getValue().compareTo(o2.getValue());
 	    }
-	    // }
+	});
+	for (Map.Entry<Integer, Float> entry : sortedTravelTimesMap) {
+	    BotInterface bot = this.boardConfig.botInstances.get(entry.getKey());
+	    boolean accept = bot.collectPowerUp(paths[entry.getKey()]);
+	    if (accept) {
+		return;
+	    }
 	}
-	if (fastestPlayer == this.playerID) {
-	    BotInterface bot = this.boardConfig.botInstances.get(fastestBot);
-	    bot.collectPowerUp(paths[fastestPlayer][fastestBot]);
-	}
+	System.out.println("All bots were already busy collecting powerups!");
     }
 
 }
