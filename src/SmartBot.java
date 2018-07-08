@@ -48,7 +48,7 @@ public class SmartBot implements Runnable {
 	mapUpdateThread.start();
 
 	this.boardConfig.botInstances.add(new BrushThread(this.boardConfig, this.playerNumber));
-	this.boardConfig.botInstances.add(new PencilBot(playerNumber, this.boardConfig,1));
+	this.boardConfig.botInstances.add(new BasicBot(playerNumber, this.boardConfig,1, new PencilBehaviour()));
 	this.boardConfig.botInstances.add(new WidePencilBot());
 	for (int i = 0; i < 3; i++) {
 	    this.boardConfig.botThreads.add(new Thread(this.boardConfig.botInstances.get(i)));
