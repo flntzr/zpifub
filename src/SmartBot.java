@@ -39,6 +39,7 @@ public class SmartBot implements Runnable {
 	map.initWalkMap();
 	map.pullCompleteMap();
 	map.update(this.boardConfig.bots[2][2][0], this.boardConfig.bots[2][2][1], 1024);
+	map.renderWalkMap();
 	Thread heatmapUpdateThread = new Thread(new ScoreHeatmapUpdateThread(this.playerNumber, this.boardConfig));
 	heatmapUpdateThread.start();
 	this.boardConfig.botInstances.add(new BrushThread(this.boardConfig, this.playerNumber));
@@ -94,7 +95,7 @@ public class SmartBot implements Runnable {
 			int[] direction = bot.getMoveDirection();
 			client.setMoveDirection(i, direction[0], direction[1]);
 	    }
-	    map.render();
+	    
 	}
     }
 }
