@@ -11,7 +11,7 @@ public class PencilBot implements Runnable, BotInterface{
 	private final int botId;
 	private Thread searchThread;
 	private int [] destination = new int[]{0,0};
-	private int aStarLayer = 4;
+	private int aStarLayer = 3;
 	
 	public PencilBot(int playerNumber,BoardConfig board, int botId) {
 		this.playerNumber = playerNumber;
@@ -31,11 +31,13 @@ public class PencilBot implements Runnable, BotInterface{
 	public void run() {
 		searchThread = new Thread(new GoalSearch());
 		while(this.board.bots[this.playerNumber][botId][0] == 0){
+
 			idleMove(); //Idle bis Erstininitialsierung
 		}
 		searchThread.start();
 		while(true){
-			if(searching || this.pathCoords.length == 0 || pathIndex >= this.pathCoords.length) {
+			if(searching || pathCoords == null ||this.pathCoords.length == 0) {
+				if(pathCoords == null || this.pathCoords.length == 0) searching = true;
 				idleMove(); //Idle wenn kein Ziel gefunden
 			} else {
 				walkPath(); //Erstmal direkt aufs Ziel gehen
@@ -56,14 +58,20 @@ public class PencilBot implements Runnable, BotInterface{
 	int[][] pathCoords;
 	
 	private void walkPath(){
-		if(walkToDestination(pathCoords[pathIndex][0]*(1<<aStarLayer),pathCoords[pathIndex][1]*(1<<aStarLayer),16)){
+		
+		if(walkToDestination(pathCoords[pathIndex][0]*(1<<aStarLayer),pathCoords[pathIndex][1]*(1<<aStarLayer),12)){
 			pathIndex++;
 			System.out.println("next Step");
+			if(pathIndex>=pathCoords.length){
+				System.out.println("Pfad beendet");
+				searching = true;			
+			}
 		}
 		
 		//System.out.println(pathIndex+":"+pathCoords.length);
 		if(pathIndex>=pathCoords.length){
-			searching = true;			
+			searching = true;
+			System.out.println("Pfad beendet");
 		}
 	}
 	
@@ -162,8 +170,9 @@ public class PencilBot implements Runnable, BotInterface{
 					pathCoords = getPathToDestination();
 					pathIndex = 0;
 					searching = false;
+					System.out.println(searching || pathCoords.length == 0);
 				} else{
-					//restartSearchIfNoMoveHappendInMilliseconds(1000);
+					restartSearchIfNoMoveHappendInMilliseconds(1000);
 				}
 
 			}			
@@ -171,14 +180,19 @@ public class PencilBot implements Runnable, BotInterface{
 		
 		private void searchDestination() {
 
-			do {
-				//Erstmal nur Random ein begehbares Ziel suchen
-				//TODO: Hier mit Bewertungsfunktion suchen
-				destination[0] = random.nextInt(board.layer[aStarLayer].length);
-				destination[1] = random.nextInt(board.layer[aStarLayer].length);
-			} while(board.walklayer[aStarLayer][destination[0]][destination[1]]==0);
-			destination[0] *= (1<<aStarLayer);
-			destination[1] *= (1<<aStarLayer);
+			int gegnerA = (playerNumber + 1)%3;
+			int bot = 0;
+			destination[0] = board.bots[gegnerA][bot][0];
+			destination[1] = board.bots[gegnerA][bot][1];
+			
+//			do {
+//				//Erstmal nur Random ein begehbares Ziel suchen
+//				//TODO: Hier mit Bewertungsfunktion suchen
+//				destination[0] = random.nextInt(board.layer[aStarLayer].length);
+//				destination[1] = random.nextInt(board.layer[aStarLayer].length);
+//			} while(board.walklayer[aStarLayer][destination[0]][destination[1]]==0);
+//			destination[0] *= (1<<aStarLayer);
+//			destination[1] *= (1<<aStarLayer);
 
 		}
 		
@@ -191,7 +205,7 @@ public class PencilBot implements Runnable, BotInterface{
 			int[] destNew = new int[]{destination[0],destination[1]};
 			destNew[0] /=(1<<aStarLayer); 
 			destNew[1] /=(1<<aStarLayer);
-			int[][] coords = AStar.AStar(startNew,destNew,board.layer[aStarLayer],board.layer[aStarLayer].length);
+			int[][] coords = AStar.AStar(startNew,destNew,board.walklayer[aStarLayer],board.walklayer[aStarLayer].length);
 			for(int i = 0; i< coords.length; i++){
 				System.out.println(Arrays.toString(coords[i]));
 			}
