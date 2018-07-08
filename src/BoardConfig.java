@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -6,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lenz.htw.zpifub.PowerupType;
 
 public class BoardConfig {
 
@@ -24,7 +27,7 @@ public class BoardConfig {
     public List<BotInterface> botInstances;
     public List<Thread> botThreads;
     /** [startX, startY, endX, endY] */
-    public int[] slowdownArea = {-1,-1,-1,-1};
+    public int[][] slowdownAreas = {};
 
     public BoardConfig(int[] influenceRadii) {
 	this.bots = new int[3][3][2]; // 3 players, 3 bots, 2 coordinates
@@ -37,16 +40,44 @@ public class BoardConfig {
 	this.bots[playerID][botID][0] = x;
 	this.bots[playerID][botID][1] = y;
     }
-    
-    public void setSlowPowerupArea(int startX, int startY, int endX, int endY) {
-	this.slowdownArea[0] = startX;
-	this.slowdownArea[1] = startY;
-	this.slowdownArea[2] = endX;
-	this.slowdownArea[3] = endY;
+
+    public void addSlowPowerup(int x, int y) {
+	// powerups can be collected in a 20px radius. For good measure make it 30px.
+	int powerupRadius = 30;
+	int[][] newAreas = new int[this.slowdownAreas.length + 1][6];
+	System.arraycopy(this.slowdownAreas, 0, newAreas, 0, this.slowdownAreas.length);
+	int index = this.slowdownAreas.length;
+	newAreas[index][0] = x;
+	newAreas[index][1] = y;
+	newAreas[index][2] = x - powerupRadius;
+	newAreas[index][3] = y - powerupRadius;
+	newAreas[index][4] = x + powerupRadius;
+	newAreas[index][5] = y + powerupRadius;
+	this.slowdownAreas = newAreas;
     }
-    
+
+    public void removeSlowPowerup(PowerupType type, int x, int y) {
+	if (!type.name().equals("SLOW")) {
+	    return;
+	}
+	int[][] newAreas = new int[this.slowdownAreas.length - 1][6];
+	int newAreasIndex = 0;
+	for (int i = 0; i < this.slowdownAreas.length; i++) {
+	    if (x != this.slowdownAreas[i][0] || y != this.slowdownAreas[i][1]) {
+		newAreas[newAreasIndex] = this.slowdownAreas[i];
+		newAreasIndex++;
+	    }
+	}
+	this.slowdownAreas = newAreas;
+    }
+
     public boolean isWithinSlowPowerupArea(int x, int y) {
-	return x >= slowdownArea[0] && y >= slowdownArea[1] && x <= slowdownArea[2] && y <= slowdownArea[3];
+	for (int[] slowdownArea : this.slowdownAreas) {
+	    if (x >= slowdownArea[2] && y >= slowdownArea[3] && x <= slowdownArea[4] && y <= slowdownArea[5]) {
+		return true;
+	    }
+	}
+	return false;
     }
 
     public int getColor(int layer, int x, int y) {
@@ -67,20 +98,20 @@ public class BoardConfig {
     }
 
     public int[] aStar(int x, int y, int destX, int destY, int layer) {
-		int layerSize = Util.BOARD_SIZE >> layer;
-		int start = (y >> layer) * (Util.BOARD_SIZE >> layer) + (x >> layer);
-		int dest = (destY >> layer) * (Util.BOARD_SIZE >> layer) + (destX >> layer);
-		
-		List<Integer> path = aStar(start, dest, layer);
-		int[] result = new int[path.size()*2];
-		for (int i = 0; i < result.length>>1; i++) {
-		    int step = path.get(i);
-		    int stepLayerX = step % layerSize;
-		    int stepLayerY = step / layerSize;
-		    result[i*2] = stepLayerX * 1<<layer;
-		    result[i*2+1] = stepLayerY * 1<<layer;
-		}
-		return result;
+	int layerSize = Util.BOARD_SIZE >> layer;
+	int start = (y >> layer) * (Util.BOARD_SIZE >> layer) + (x >> layer);
+	int dest = (destY >> layer) * (Util.BOARD_SIZE >> layer) + (destX >> layer);
+
+	List<Integer> path = aStar(start, dest, layer);
+	int[] result = new int[path.size() * 2];
+	for (int i = 0; i < result.length >> 1; i++) {
+	    int step = path.get(i);
+	    int stepLayerX = step % layerSize;
+	    int stepLayerY = step / layerSize;
+	    result[i * 2] = stepLayerX * 1 << layer;
+	    result[i * 2 + 1] = stepLayerY * 1 << layer;
+	}
+	return result;
     }
 
     /**

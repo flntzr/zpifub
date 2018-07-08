@@ -11,7 +11,7 @@ public class PencilBot implements Runnable, BotInterface{
 	private final int botId;
 	private Thread searchThread;
 	private int [] destination = new int[]{0,0};
-	private int aStarLayer = 3;
+	private int aStarLayer = 5;
 	
 	public PencilBot(int playerNumber,BoardConfig board, int botId) {
 		this.playerNumber = playerNumber;
@@ -205,7 +205,7 @@ public class PencilBot implements Runnable, BotInterface{
 			int[] destNew = new int[]{destination[0],destination[1]};
 			destNew[0] /=(1<<aStarLayer); 
 			destNew[1] /=(1<<aStarLayer);
-			int[][] coords = AStar.AStar(startNew,destNew,board.walklayer[aStarLayer],board.walklayer[aStarLayer].length);
+			int[][] coords = AStar.AStar(startNew,destNew,board.walklayer[aStarLayer],board.walklayer[aStarLayer].length,null);
 			for(int i = 0; i< coords.length; i++){
 				System.out.println(Arrays.toString(coords[i]));
 			}

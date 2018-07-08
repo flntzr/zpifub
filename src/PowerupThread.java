@@ -18,9 +18,7 @@ public class PowerupThread implements Runnable {
     @Override
     public void run() {
 	if (this.powerupType.name().equals("SLOW")) {
-	    // powerups can be collected in a 20px radius. For good measure make it 30px.
-	    int powerupRadius = 30;
-	    this.boardConfig.setSlowPowerupArea(x - powerupRadius, y - powerupRadius, x + powerupRadius, y + powerupRadius);
+	    this.boardConfig.addSlowPowerup(x, y);
 	    return;
 	}
 	int[][][] paths = new int[3][3][];

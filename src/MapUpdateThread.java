@@ -1,23 +1,28 @@
 
-public class ScoreHeatmapUpdateThread implements Runnable {
-    private final int refreshInterval = 2;
+public class MapUpdateThread implements Runnable {
+    private final int refreshIntervalInMillis = 500;
     private final int gameRuntime = 60;
     private final int playerID;
+    private final StrategicMap map;
     private final BoardConfig config;
 
-    public ScoreHeatmapUpdateThread(int playerID, BoardConfig boardConfig) {
+    public MapUpdateThread(int playerID, BoardConfig boardConfig, StrategicMap map) {
 	this.playerID = playerID;
 	this.config = boardConfig;
+	this.map = map;
     }
 
     @Override
     public void run() {
 	int runtime = 0;
 	while (runtime < gameRuntime + 10) {
+	    map.pullCompleteMap();
+	    map.update(1, 1, 1024);
 	    this.refreshScoreLayers();
+	    map.render();
 	    this.config.isScoreHeatmapInitialized = true;
 	    try {
-		Thread.sleep(refreshInterval * 1000);
+		Thread.sleep(refreshIntervalInMillis);
 	    } catch (InterruptedException e) {
 		e.printStackTrace();
 	    }
