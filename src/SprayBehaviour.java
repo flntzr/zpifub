@@ -5,8 +5,6 @@ import java.util.List;
 
 public class SprayBehaviour extends BotBehaviour {
 
-
-
     int lastX = 0;
     int lastY = 0;
     long timeOfLastMove = 0;
@@ -73,7 +71,7 @@ public class SprayBehaviour extends BotBehaviour {
 	    	
 	    }
 	}
-	
+
 	int heatmapSize = Util.BOARD_SIZE >> bot.aStarLayer;
 	List<int[]> scores = new ArrayList<>(); // [x, y, score]
 	for (int y = 0; y < heatmapSize; y++) {
