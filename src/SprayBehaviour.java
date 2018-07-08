@@ -4,9 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class SprayBehaviour extends BotBehaviour {
-
-    private static final int BOT_ID = 0;
-    private static final int A_STAR_LAYER = 4;
     int lastX = 0;
     int lastY = 0;
     long timeOfLastMove = 0;
@@ -71,14 +68,14 @@ public class SprayBehaviour extends BotBehaviour {
 	    } catch (InterruptedException e) {
 	    }
 	}
-	int heatmapSize = Util.BOARD_SIZE >> A_STAR_LAYER;
+	int heatmapSize = Util.BOARD_SIZE >> bot.aStarLayer;
 	List<int[]> scores = new ArrayList<>(); // [x, y, score]
 	for (int y = 0; y < heatmapSize; y++) {
 	    for (int x = 0; x < heatmapSize; x++) {
 		int[] score = new int[3];
 		score[0] = x;
 		score[1] = y;
-		score[2] = bot.board.scoreHeatmap[A_STAR_LAYER][x][y];
+		score[2] = bot.board.scoreHeatmap[bot.aStarLayer][x][y];
 		scores.add(score);
 	    }
 	}
@@ -92,9 +89,9 @@ public class SprayBehaviour extends BotBehaviour {
 	// TODO also take the distance into account to find the best target
 	int[] pickedScore = scores.get(0);
 	int[] position = new int[2];
-	int centerOffset = A_STAR_LAYER == 0 ? 0 : 1 << (A_STAR_LAYER - 1);
-	position[0] = (pickedScore[0] << A_STAR_LAYER) + centerOffset;
-	position[1] = (pickedScore[1] << A_STAR_LAYER) + centerOffset;
+	int centerOffset = bot.aStarLayer == 0 ? 0 : 1 << (bot.aStarLayer - 1);
+	position[0] = (pickedScore[0] << bot.aStarLayer) + centerOffset;
+	position[1] = (pickedScore[1] << bot.aStarLayer) + centerOffset;
 	return position;
     }
 }
