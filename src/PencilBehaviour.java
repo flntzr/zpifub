@@ -6,13 +6,16 @@ class PencilBehaviour extends BotBehaviour{
 		int lastX = 0;
 		int lastY = 0;
 		long timeOfLastMove = 0;
-
+		int gegnerId;
+		int botId;	
 		public PencilBehaviour() {
 			super();
 		}
 
 		@Override
 		public void run() {
+			gegnerId = (bot.playerNumber + (bot.random.nextInt(1)+1))%3;
+			botId =	bot.random.nextInt(3);
 			while(true) {
 				if(bot.searching) {
 					System.out.println("Suche neues Ziel...");
@@ -29,10 +32,9 @@ class PencilBehaviour extends BotBehaviour{
 		}
 		
 		private void searchDestination() {
-			int gegnerA = (bot.playerNumber + 1)%3;
-			int botId = 0;			
-			bot.destination[0] = bot.board.bots[gegnerA][botId][0];
-			bot.destination[1] = bot.board.bots[gegnerA][botId][1];
+			
+			bot.destination[0] = bot.board.bots[gegnerId][botId][0];
+			bot.destination[1] = bot.board.bots[gegnerId][botId][1];
 		}
 		
 		private int[][] getPathToDestination(){
@@ -44,7 +46,7 @@ class PencilBehaviour extends BotBehaviour{
 			int[] destNew = new int[]{bot.destination[0],bot.destination[1]};
 			destNew[0] /=(1<<bot.aStarLayer); 
 			destNew[1] /=(1<<bot.aStarLayer);
-			int[][] coords = AStar.AStar(startNew,destNew,bot.board.walklayer[bot.aStarLayer],bot.board.walklayer[bot.aStarLayer].length,null);
+			int[][] coords = AStar.AStar(startNew,destNew,bot.board.walklayer[bot.aStarLayer],bot.board.walklayer[bot.aStarLayer].length, bot.board.scoreHeatmap[bot.aStarLayer]);
 			for(int i = 0; i< coords.length; i++){
 				System.out.println(Arrays.toString(coords[i]));
 			}

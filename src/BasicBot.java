@@ -11,8 +11,8 @@ public class BasicBot implements Runnable, BotInterface{
 	public final int botId;
 	public Thread searchThread;
 	public int[] destination = new int[]{0,0};
-	public int aStarLayer = 5;
-	public int pointReachRange = 20; //Reichweite ab wann ein Punkt erreicht wurde
+	public int aStarLayer = 4;
+	public int pointReachRange = 5; //Reichweite ab wann ein Punkt erreicht wurde
 	public boolean searching = true;
 	public int pathIndex;
 	public int[][] pathCoords;
