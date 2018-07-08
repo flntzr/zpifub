@@ -35,7 +35,7 @@ public class PencilBot implements Runnable, BotInterface{
 		}
 		searchThread.start();
 		while(true){
-			if(searching || this.pathCoords.length == 0) {
+			if(searching || this.pathCoords.length == 0 || pathIndex >= this.pathCoords.length) {
 				idleMove(); //Idle wenn kein Ziel gefunden
 			} else {
 				walkPath(); //Erstmal direkt aufs Ziel gehen

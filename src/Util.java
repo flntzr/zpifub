@@ -52,4 +52,28 @@ public class Util {
     private static int clamp(int val, int min, int max) {
 	return Math.max(min, Math.min(max, val));
     }
+
+    public static String printPath(int[] path) {
+	String[] pathStrings = new String[path.length];
+	for (int i = 0; i < path.length; i++) {
+	    int x = path[i] % BOARD_SIZE;
+	    int y = path[i] / BOARD_SIZE;
+	    pathStrings[i] = "[" + x + ", " + y + "]";
+	}
+	String result = String.join(", ", pathStrings);
+	System.out.println(result);
+	return result;
+    }
+    
+    public static String printPath(Integer[] path) {
+	String[] pathStrings = new String[path.length];
+	for (int i = 0; i < path.length; i++) {
+	    int x = path[i] % BOARD_SIZE;
+	    int y = path[i] / BOARD_SIZE;
+	    pathStrings[i] = "[" + x + ", " + y + "]";
+	}
+	String result = String.join(", ", pathStrings);
+	System.out.println(result);
+	return result;
+    }
 }
