@@ -1,6 +1,6 @@
 
 public class MapUpdateThread implements Runnable {
-    private final int refreshInterval = 2;
+    private final int refreshIntervalInMillis = 500;
     private final int gameRuntime = 60;
     private final int playerID;
     private final StrategicMap map;
@@ -22,7 +22,7 @@ public class MapUpdateThread implements Runnable {
 	    map.render();
 	    this.config.isScoreHeatmapInitialized = true;
 	    try {
-		Thread.sleep(refreshInterval * 1000);
+		Thread.sleep(refreshIntervalInMillis);
 	    } catch (InterruptedException e) {
 		e.printStackTrace();
 	    }
