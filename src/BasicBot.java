@@ -46,7 +46,8 @@ public class BasicBot implements Runnable, BotInterface {
 		idleMove(); // Idle wenn kein Ziel gefunden
 	    } else { 
 		if (this.pathCoords != null || this.pathCoords.length > 0) {
-		    walkPath(); // Erstmal direkt aufs Ziel gehen		    
+		    int[][] coords = this.pathCoords;
+		    walkPath(coords); // Erstmal direkt aufs Ziel gehen		    
 		}
 		// TODO: N�chster Schritt,Hier A* Einbinden und testen
 	    }
@@ -59,21 +60,24 @@ public class BasicBot implements Runnable, BotInterface {
 	this.direction[1] = random.nextInt(100) - 50;
     }
 
-    private void walkPath() {
-	if (walkToDestination(pathCoords[pathIndex][0] * (1 << aStarLayer),
-		pathCoords[pathIndex][1] * (1 << aStarLayer), pointReachRange)) {
-	    pathIndex++;
-	    // System.out.println("next Step");
-	    if (pathIndex >= pathCoords.length) {
-		// System.out.println("Pfad beendet");
-		searching = true;
+    private void walkPath(int[][] coords) {
+	try {
+	    if (walkToDestination(coords[pathIndex][0] * (1 << aStarLayer),
+		    coords[pathIndex][1] * (1 << aStarLayer), pointReachRange)) {
+		pathIndex++;
+		// System.out.println("next Step");
+		if (pathIndex >= coords.length) {
+		    // System.out.println("Pfad beendet");
+		    searching = true;
+		}
 	    }
-	}
-
-	// System.out.println(pathIndex+":"+pathCoords.length);
-	if (pathIndex >= pathCoords.length) {
-	    searching = true;
-	    // System.out.println("Pfad beendet");
+	    
+	    // System.out.println(pathIndex+":"+pathCoords.length);
+	    if (pathIndex >= coords.length) {
+		searching = true;
+		// System.out.println("Pfad beendet");
+	    }	    
+	} catch(ArrayIndexOutOfBoundsException e) {
 	}
     }
 

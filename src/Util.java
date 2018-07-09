@@ -23,9 +23,9 @@ public class Util {
 	if (color == 0) {
 	    return -10;
 	}
-	int ownColorDistanceTo255 = 255 - ((color >> ((2 - playerID) * 8)) & 0xFF); // range: [0, 255]
-	int otherColorsDistanceTo0 = ((color >> (((1 - playerID) % 3) * 8)) & 0xFF)
-		+ ((color >> (((-playerID) % 3) * 8)) & 0xFF); // range : [0, 510]
+	int ownColorDistanceTo255 = 255 - ((color >> ((3 + playerID) % 3 * 8)) & 0xFF); // range: [0, 255]
+	int otherColorsDistanceTo0 = ((color >> (((1 + playerID) % 3) * 8)) & 0xFF)
+		+ ((color >> (((2 + playerID) % 3) * 8)) & 0xFF); // range : [0, 510]
 	return (ownColorDistanceTo255 + otherColorsDistanceTo0) / 3;
     }
 
@@ -64,7 +64,7 @@ public class Util {
 	System.out.println(result);
 	return result;
     }
-    
+
     public static String printPath(Integer[] path) {
 	String[] pathStrings = new String[path.length];
 	for (int i = 0; i < path.length; i++) {

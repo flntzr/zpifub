@@ -29,8 +29,8 @@ public class PowerupThread implements Runnable {
 
     @Override
     public void run() {
+	this.boardConfig.addPowerup(this.powerupType, this.x, this.y);
 	if (this.powerupType.name().equals("SLOW")) {
-	    this.boardConfig.addSlowPowerup(x, y);
 	    return;
 	}
 	int[][][] paths = new int[3][][];

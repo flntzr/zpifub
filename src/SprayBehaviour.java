@@ -94,6 +94,7 @@ public class SprayBehaviour extends BotBehaviour {
 	    }
 	});
 	int[] pickedScore = scores.get(0);
+//	System.out.println(pickedScore[0] + ", " + pickedScore[1]);
 	int[] position = new int[2];
 	int centerOffset = bot.aStarLayer == 0 ? 0 : 1 << (bot.aStarLayer - 1);
 	position[0] = (pickedScore[0] << bot.aStarLayer) + centerOffset;

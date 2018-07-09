@@ -25,8 +25,10 @@ public class BoardConfig {
     public final int[] influenceRadii;
     public List<BotInterface> botInstances;
     public List<Thread> botThreads;
-    /** [startX, startY, endX, endY] */
-    public int[][] slowdownAreas = {};
+    /** [x, y, startX, startY, endX, endY] */
+    public int[][] powerdownAreas = {};
+    /** [x, y, startX, startY, endX, endY] */
+    public int[][] powerupAreas = {};
 
     public BoardConfig(int[] influenceRadii) {
 	this.bots = new int[3][3][2]; // 3 players, 3 bots, 2 coordinates
@@ -40,38 +42,54 @@ public class BoardConfig {
 	this.bots[playerID][botID][1] = y;
     }
 
-    public void addSlowPowerup(int x, int y) {
+    public void addPowerup(PowerupType type, int x, int y) {
 	// powerups can be collected in a 20px radius. For good measure make it 30px.
+	int[][] oldAreas = type.name().equals("SLOW") ? this.powerdownAreas : this.powerupAreas;
 	int powerupRadius = 30;
-	int[][] newAreas = new int[this.slowdownAreas.length + 1][6];
-	System.arraycopy(this.slowdownAreas, 0, newAreas, 0, this.slowdownAreas.length);
-	int index = this.slowdownAreas.length;
+	int[][] newAreas = new int[oldAreas.length + 1][6];
+	System.arraycopy(oldAreas, 0, newAreas, 0, oldAreas.length);
+	int index = oldAreas.length;
 	newAreas[index][0] = x;
 	newAreas[index][1] = y;
 	newAreas[index][2] = x - powerupRadius;
 	newAreas[index][3] = y - powerupRadius;
 	newAreas[index][4] = x + powerupRadius;
 	newAreas[index][5] = y + powerupRadius;
-	this.slowdownAreas = newAreas;
+	if (type.name().equals("SLOW")) {
+	    this.powerdownAreas = newAreas;	    
+	} else {
+	    this.powerupAreas = newAreas;
+	}
     }
 
     public void removeSlowPowerup(PowerupType type, int x, int y) {
-	if (!type.name().equals("SLOW")) {
-	    return;
-	}
-	int[][] newAreas = new int[this.slowdownAreas.length - 1][6];
+	int[][] oldAreas = type.name().equals("SLOW") ? this.powerdownAreas : this.powerupAreas;
+	int[][] newAreas = new int[oldAreas.length - 1][6];
 	int newAreasIndex = 0;
-	for (int i = 0; i < this.slowdownAreas.length; i++) {
-	    if (x != this.slowdownAreas[i][0] || y != this.slowdownAreas[i][1]) {
-		newAreas[newAreasIndex] = this.slowdownAreas[i];
+	for (int i = 0; i < oldAreas.length; i++) {
+	    if (x != oldAreas[i][0] || y != oldAreas[i][1]) {
+		newAreas[newAreasIndex] = oldAreas[i];
 		newAreasIndex++;
 	    }
 	}
-	this.slowdownAreas = newAreas;
+	if (type.name().equals("SLOW")) {
+	    this.powerdownAreas = newAreas;	    
+	} else {
+	    this.powerupAreas = newAreas;
+	}
     }
 
-    public boolean isWithinSlowPowerupArea(int x, int y) {
-	for (int[] slowdownArea : this.slowdownAreas) {
+    public boolean isWithinPowerdownArea(int x, int y) {
+	for (int[] slowdownArea : this.powerdownAreas) {
+	    if (x >= slowdownArea[2] && y >= slowdownArea[3] && x <= slowdownArea[4] && y <= slowdownArea[5]) {
+		return true;
+	    }
+	}
+	return false;
+    }
+    
+    public boolean isWithinPowerupArea(int x, int y) {
+	for (int[] slowdownArea : this.powerupAreas) {
 	    if (x >= slowdownArea[2] && y >= slowdownArea[3] && x <= slowdownArea[4] && y <= slowdownArea[5]) {
 		return true;
 	    }

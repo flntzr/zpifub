@@ -22,6 +22,8 @@ class PencilBehaviour extends BotBehaviour{
 
 			while(true) {
 				if(bot.searching) {
+					System.out.println("Search");
+
 //					System.out.println("Suche neues Ziel...");
 					searchDestination();
 					bot.pathCoords = getPathToDestination();
